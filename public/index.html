@@ -1,1040 +1,1108 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Pantheon — مجلس الاستثمار الذكي</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cairo:wght@300;400;600;700&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
-<style>
-:root {
-  --gold: #C9A84C;
-  --gold-light: #E8C97A;
-  --gold-dim: #7A6030;
-  --obsidian: #080A0E;
-  --obsidian-2: #0D1018;
-  --obsidian-3: #141820;
-  --obsidian-4: #1C2230;
-  --stone: #2A3040;
-  --text: #D4C5A0;
-  --text-dim: #7A7060;
-  --white: #F5EED8;
-  --green: #2ECC71;
-  --red: #E74C3C;
-  --amber: #F39C12;
-  --blue: #3498DB;
-}
-
-* { margin: 0; padding: 0; box-sizing: border-box; }
-
-body {
-  font-family: 'Cairo', sans-serif;
-  background: var(--obsidian);
-  color: var(--text);
-  min-height: 100vh;
-  overflow-x: hidden;
-}
-
-/* ─── BACKGROUND ─── */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background:
-    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(201,168,76,0.08) 0%, transparent 60%),
-    radial-gradient(ellipse 40% 40% at 90% 90%, rgba(201,168,76,0.04) 0%, transparent 50%);
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* ─── GRAIN OVERLAY ─── */
-body::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-  opacity: 0.3;
-  pointer-events: none;
-  z-index: 0;
-}
-
-.container { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 0 24px; }
-
-/* ─── HEADER ─── */
-header {
-  border-bottom: 1px solid rgba(201,168,76,0.15);
-  padding: 32px 0 28px;
-  margin-bottom: 56px;
-}
-
-.header-inner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.logo-block { display: flex; align-items: center; gap: 16px; }
-
-.logo-emblem {
-  width: 52px;
-  height: 52px;
-  border: 1.5px solid var(--gold-dim);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: 'Cinzel', serif;
-  font-size: 22px;
-  color: var(--gold);
-  background: radial-gradient(circle, rgba(201,168,76,0.1) 0%, transparent 70%);
-  letter-spacing: 1px;
-}
-
-.logo-text h1 {
-  font-family: 'Cinzel', serif;
-  font-size: 22px;
-  font-weight: 700;
-  color: var(--gold);
-  letter-spacing: 4px;
-  text-transform: uppercase;
-}
-
-.logo-text p {
-  font-size: 11px;
-  color: var(--text-dim);
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  margin-top: 2px;
-}
-
-.header-badge {
-  font-size: 11px;
-  color: var(--text-dim);
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  border: 1px solid rgba(201,168,76,0.15);
-  padding: 6px 14px;
-  border-radius: 2px;
-}
-
-/* ─── HERO ─── */
-.hero {
-  text-align: center;
-  margin-bottom: 64px;
-}
-
-.hero-tag {
-  display: inline-block;
-  font-size: 11px;
-  letter-spacing: 4px;
-  text-transform: uppercase;
-  color: var(--gold-dim);
-  border-top: 1px solid var(--gold-dim);
-  border-bottom: 1px solid var(--gold-dim);
-  padding: 6px 20px;
-  margin-bottom: 28px;
-}
-
-.hero h2 {
-  font-family: 'Cinzel', serif;
-  font-size: clamp(28px, 5vw, 52px);
-  font-weight: 700;
-  color: var(--white);
-  line-height: 1.2;
-  margin-bottom: 16px;
-}
-
-.hero h2 span { color: var(--gold); }
-
-.hero p {
-  font-size: 16px;
-  color: var(--text-dim);
-  max-width: 520px;
-  margin: 0 auto 40px;
-  line-height: 1.8;
-}
-
-/* ─── SEARCH ─── */
-.search-box {
-  max-width: 600px;
-  margin: 0 auto;
-  position: relative;
-}
-
-.search-row {
-  display: flex;
-  gap: 0;
-  border: 1px solid rgba(201,168,76,0.3);
-  background: var(--obsidian-2);
-  border-radius: 3px;
-  overflow: hidden;
-  transition: border-color 0.3s;
-}
-
-.search-row:focus-within { border-color: var(--gold); }
-
-.search-row input {
-  flex: 1;
-  background: transparent;
-  border: none;
-  outline: none;
-  padding: 18px 24px;
-  font-family: 'Cairo', sans-serif;
-  font-size: 16px;
-  color: var(--white);
-  direction: rtl;
-}
-
-.search-row input::placeholder { color: var(--text-dim); }
-
-.search-btn {
-  background: var(--gold);
-  border: none;
-  padding: 18px 28px;
-  cursor: pointer;
-  font-family: 'Cinzel', serif;
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--obsidian);
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  transition: background 0.2s;
-  white-space: nowrap;
-}
-
-.search-btn:hover { background: var(--gold-light); }
-.search-btn:disabled { background: var(--gold-dim); cursor: not-allowed; }
-
-.suggestions {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-  flex-wrap: wrap;
-  margin-top: 16px;
-}
-
-.sug-chip {
-  font-size: 12px;
-  color: var(--text-dim);
-  border: 1px solid rgba(201,168,76,0.15);
-  padding: 5px 14px;
-  border-radius: 2px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.sug-chip:hover { border-color: var(--gold); color: var(--gold); }
-
-/* ─── PROGRESS ─── */
-#progress-section {
-  display: none;
-  margin-bottom: 48px;
-  background: var(--obsidian-2);
-  border: 1px solid rgba(201,168,76,0.15);
-  border-radius: 4px;
-  padding: 32px;
-}
-
-.progress-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.progress-header h3 {
-  font-family: 'Cinzel', serif;
-  font-size: 14px;
-  color: var(--gold);
-  letter-spacing: 3px;
-}
-
-.progress-pct { font-size: 13px; color: var(--text-dim); font-variant-numeric: tabular-nums; }
-
-.progress-bar-track {
-  height: 2px;
-  background: var(--stone);
-  border-radius: 1px;
-  margin-bottom: 16px;
-  overflow: hidden;
-}
-
-.progress-bar-fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--gold-dim), var(--gold));
-  border-radius: 1px;
-  transition: width 0.5s ease;
-  width: 0%;
-}
-
-.progress-msg {
-  font-size: 14px;
-  color: var(--text-dim);
-  min-height: 20px;
-}
-
-.live-agents { margin-top: 20px; display: flex; flex-wrap: wrap; gap: 8px; }
-
-.agent-chip {
-  font-size: 12px;
-  padding: 5px 12px;
-  border-radius: 2px;
-  border: 1px solid rgba(201,168,76,0.15);
-  color: var(--text-dim);
-  animation: fadeIn 0.4s ease;
-  display: flex; align-items: center; gap: 6px;
-}
-
-.agent-chip.buy { border-color: rgba(46,204,113,0.3); color: var(--green); }
-.agent-chip.sell { border-color: rgba(231,76,60,0.3); color: var(--red); }
-.agent-chip.hold { border-color: rgba(243,156,18,0.3); color: var(--amber); }
-
-/* ─── RESULTS ─── */
-#results-section { display: none; }
-
-/* VERDICT CARD */
-.verdict-card {
-  border: 1px solid rgba(201,168,76,0.3);
-  background: linear-gradient(135deg, var(--obsidian-2) 0%, var(--obsidian-3) 100%);
-  border-radius: 4px;
-  padding: 40px;
-  margin-bottom: 32px;
-  position: relative;
-  overflow: hidden;
-  animation: fadeUp 0.6s ease;
-}
-
-.verdict-card::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--gold), transparent);
-}
-
-.verdict-grid {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: 32px;
-  align-items: center;
-}
-
-.verdict-label {
-  font-family: 'Cinzel', serif;
-  font-size: 11px;
-  letter-spacing: 3px;
-  color: var(--text-dim);
-  text-transform: uppercase;
-  margin-bottom: 8px;
-}
-
-.verdict-big {
-  font-family: 'Cinzel', serif;
-  font-size: 52px;
-  font-weight: 900;
-  line-height: 1;
-}
-
-.verdict-big.BUY { color: var(--green); }
-.verdict-big.SELL { color: var(--red); }
-.verdict-big.HOLD { color: var(--amber); }
-
-.conviction-badge {
-  display: inline-block;
-  font-size: 11px;
-  letter-spacing: 2px;
-  padding: 4px 12px;
-  border-radius: 2px;
-  margin-top: 10px;
-}
-
-.conviction-badge.HIGH { background: rgba(46,204,113,0.1); color: var(--green); border: 1px solid rgba(46,204,113,0.3); }
-.conviction-badge.MEDIUM { background: rgba(243,156,18,0.1); color: var(--amber); border: 1px solid rgba(243,156,18,0.3); }
-.conviction-badge.LOW { background: rgba(231,76,60,0.1); color: var(--red); border: 1px solid rgba(231,76,60,0.3); }
-
-.allocation-bars { display: flex; flex-direction: column; gap: 10px; }
-
-.alloc-row { display: flex; align-items: center; gap: 12px; }
-
-.alloc-label { font-size: 12px; color: var(--text-dim); width: 50px; text-align: right; }
-
-.alloc-track { flex: 1; height: 6px; background: var(--stone); border-radius: 3px; overflow: hidden; }
-
-.alloc-fill { height: 100%; border-radius: 3px; transition: width 1s ease 0.5s; width: 0%; }
-.alloc-fill.buy { background: var(--green); }
-.alloc-fill.hold { background: var(--amber); }
-.alloc-fill.sell { background: var(--red); }
-
-.alloc-pct { font-size: 13px; color: var(--white); width: 36px; font-variant-numeric: tabular-nums; }
-
-.verdict-summary {
-  font-size: 15px;
-  color: var(--text);
-  line-height: 1.9;
-  margin-top: 24px;
-  padding-top: 24px;
-  border-top: 1px solid rgba(201,168,76,0.1);
-}
-
-/* CASES GRID */
-.cases-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-  margin-top: 24px;
-}
-
-.case-card {
-  background: var(--obsidian-3);
-  border-radius: 3px;
-  padding: 20px;
-  border-right: 3px solid transparent;
-}
-
-.case-card.bull { border-right-color: var(--green); }
-.case-card.bear { border-right-color: var(--red); }
-
-.case-label {
-  font-size: 11px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  margin-bottom: 8px;
-}
-
-.case-card.bull .case-label { color: var(--green); }
-.case-card.bear .case-label { color: var(--red); }
-
-.case-text { font-size: 14px; color: var(--text-dim); line-height: 1.7; }
-
-/* SECTION TITLE */
-.section-title {
-  font-family: 'Cinzel', serif;
-  font-size: 13px;
-  letter-spacing: 4px;
-  color: var(--gold);
-  text-transform: uppercase;
-  margin-bottom: 20px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.section-title::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: rgba(201,168,76,0.15);
-}
-
-/* AGENTS GRID */
-.agents-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 16px;
-  margin-bottom: 32px;
-  animation: fadeUp 0.6s ease 0.2s both;
-}
-
-.agent-card {
-  background: var(--obsidian-2);
-  border: 1px solid rgba(201,168,76,0.1);
-  border-radius: 4px;
-  padding: 24px;
-  transition: border-color 0.2s;
-}
-
-.agent-card:hover { border-color: rgba(201,168,76,0.3); }
-
-.agent-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 14px;
-}
-
-.agent-name-block {}
-
-.agent-emoji { font-size: 22px; margin-bottom: 4px; display: block; }
-.agent-name { font-family: 'Cinzel', serif; font-size: 13px; color: var(--white); letter-spacing: 1px; }
-
-.verdict-pill {
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  padding: 5px 12px;
-  border-radius: 2px;
-}
-
-.verdict-pill.BUY { background: rgba(46,204,113,0.15); color: var(--green); }
-.verdict-pill.SELL { background: rgba(231,76,60,0.15); color: var(--red); }
-.verdict-pill.HOLD { background: rgba(243,156,18,0.15); color: var(--amber); }
-
-.agent-confidence {
-  font-size: 12px;
-  color: var(--text-dim);
-  margin-bottom: 12px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.conf-bar { flex: 1; height: 3px; background: var(--stone); border-radius: 2px; overflow: hidden; }
-.conf-fill { height: 100%; background: var(--gold); border-radius: 2px; }
-
-.agent-reasoning { font-size: 13px; color: var(--text-dim); line-height: 1.7; margin-bottom: 14px; }
-
-.agent-risks {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  border-top: 1px solid rgba(201,168,76,0.08);
-  padding-top: 14px;
-}
-
-.risk-block label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--text-dim); display: block; margin-bottom: 4px; }
-.risk-block span { font-size: 12px; color: var(--text); }
-
-/* CROWD SECTION */
-.crowd-section {
-  margin-bottom: 32px;
-  animation: fadeUp 0.6s ease 0.3s both;
-}
-
-.crowd-summary {
-  background: var(--obsidian-2);
-  border: 1px solid rgba(201,168,76,0.1);
-  border-radius: 4px;
-  padding: 28px;
-  margin-bottom: 16px;
-  display: flex;
-  align-items: center;
-  gap: 32px;
-}
-
-.crowd-big {
-  font-family: 'Cinzel', serif;
-  font-size: 13px;
-  color: var(--text-dim);
-  letter-spacing: 2px;
-  text-align: center;
-}
-
-.crowd-big span {
-  display: block;
-  font-size: 38px;
-  font-weight: 700;
-  color: var(--white);
-  font-variant-numeric: tabular-nums;
-}
-
-.crowd-big.g span { color: var(--green); }
-.crowd-big.r span { color: var(--red); }
-.crowd-big.a span { color: var(--amber); }
-
-.crowd-divider { width: 1px; height: 60px; background: rgba(201,168,76,0.1); }
-
-.crowd-text { flex: 1; font-size: 14px; color: var(--text-dim); line-height: 1.7; }
-
-.crowd-batches {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 10px;
-}
-
-.batch-card {
-  background: var(--obsidian-3);
-  border: 1px solid rgba(201,168,76,0.08);
-  border-radius: 3px;
-  padding: 14px 16px;
-}
-
-.batch-name { font-size: 11px; color: var(--text-dim); margin-bottom: 8px; }
-
-.batch-bar-row { display: flex; height: 4px; border-radius: 2px; overflow: hidden; gap: 1px; margin-bottom: 8px; }
-.batch-bar-buy { background: var(--green); }
-.batch-bar-hold { background: var(--amber); }
-.batch-bar-sell { background: var(--red); }
-
-.batch-emotion { font-size: 12px; color: var(--text); }
-
-/* STRATEGY SECTION */
-.strategy-section {
-  background: var(--obsidian-2);
-  border: 1px solid rgba(201,168,76,0.15);
-  border-radius: 4px;
-  padding: 32px;
-  margin-bottom: 32px;
-  animation: fadeUp 0.6s ease 0.4s both;
-}
-
-.strategy-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-
-.strategy-item label {
-  font-size: 11px;
-  letter-spacing: 2px;
-  color: var(--gold-dim);
-  text-transform: uppercase;
-  display: block;
-  margin-bottom: 8px;
-}
-
-.strategy-item p { font-size: 14px; color: var(--text); line-height: 1.7; }
-
-.metrics-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.metric-tag {
-  font-size: 13px;
-  color: var(--text-dim);
-  padding: 6px 0;
-  border-bottom: 1px solid rgba(201,168,76,0.06);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.metric-tag::before { content: '◆'; font-size: 8px; color: var(--gold-dim); }
-
-.risk-badge {
-  display: inline-block;
-  font-size: 12px;
-  letter-spacing: 2px;
-  padding: 6px 16px;
-  border-radius: 2px;
-}
-
-.risk-badge.LOW { background: rgba(46,204,113,0.1); color: var(--green); }
-.risk-badge.MEDIUM { background: rgba(243,156,18,0.1); color: var(--amber); }
-.risk-badge.HIGH { background: rgba(231,76,60,0.1); color: var(--red); }
-.risk-badge.EXTREME { background: rgba(231,76,60,0.2); color: #FF6B6B; }
-
-/* NEWS */
-.news-section {
-  margin-bottom: 48px;
-  animation: fadeUp 0.6s ease 0.5s both;
-}
-
-.news-list { display: flex; flex-direction: column; gap: 10px; }
-
-.news-item {
-  background: var(--obsidian-2);
-  border: 1px solid rgba(201,168,76,0.08);
-  border-radius: 3px;
-  padding: 16px 20px;
-  display: flex;
-  gap: 16px;
-  align-items: flex-start;
-  transition: border-color 0.2s;
-}
-
-.news-item:hover { border-color: rgba(201,168,76,0.2); }
-
-.news-index { font-family: 'Cinzel', serif; font-size: 18px; color: var(--gold-dim); min-width: 28px; }
-
-.news-content { flex: 1; }
-.news-title { font-size: 14px; color: var(--white); margin-bottom: 6px; line-height: 1.5; }
-.news-snippet { font-size: 12px; color: var(--text-dim); line-height: 1.6; }
-
-.news-link {
-  font-size: 11px;
-  color: var(--gold-dim);
-  text-decoration: none;
-  letter-spacing: 1px;
-  white-space: nowrap;
-  margin-top: 2px;
-  display: block;
-}
-
-.news-link:hover { color: var(--gold); }
-
-/* FOOTER */
-footer {
-  border-top: 1px solid rgba(201,168,76,0.1);
-  padding: 32px 0;
-  text-align: center;
-  color: var(--text-dim);
-  font-size: 12px;
-  letter-spacing: 2px;
-}
-
-footer span { color: var(--gold-dim); }
-
-/* ANIMATIONS */
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-/* RESPONSIVE */
-@media (max-width: 640px) {
-  .verdict-grid { grid-template-columns: 1fr; }
-  .cases-grid { grid-template-columns: 1fr; }
-  .strategy-grid { grid-template-columns: 1fr; }
-  .agents-grid { grid-template-columns: 1fr; }
-  .crowd-summary { flex-direction: column; gap: 16px; }
-  .crowd-divider { width: 60px; height: 1px; }
-  .header-badge { display: none; }
-}
-</style>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>The Pantheon — Investment Intelligence</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --bg: #06080d;
+      --surface: #0a0e16;
+      --surface2: #0f1520;
+      --surface3: #141c2e;
+      --border: #1a2235;
+      --border2: #243048;
+      --gold: #c9a84c;
+      --gold-light: #e8c97a;
+      --gold-dim: #8a6e2a;
+      --text: #e8e0d0;
+      --text2: #9a9080;
+      --text3: #5a5248;
+      --green: #2ecc71;
+      --red: #e74c3c;
+      --yellow: #f39c12;
+      --blue: #3498db;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      background-image:
+        radial-gradient(ellipse at 20% 20%, rgba(201,168,76,0.03) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 80%, rgba(52,152,219,0.02) 0%, transparent 60%);
+    }
+
+    /* NAV */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 48px;
+      border-bottom: 1px solid var(--border);
+      background: rgba(10,14,22,0.95);
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-icon {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, var(--gold-dim), var(--gold));
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+    }
+
+    .logo-text {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--gold-light);
+      letter-spacing: 1px;
+    }
+
+    .logo-sub {
+      font-size: 10px;
+      color: var(--text3);
+      letter-spacing: 3px;
+      font-family: 'JetBrains Mono', monospace;
+      margin-top: 2px;
+    }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .lang-btn {
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      color: var(--gold);
+      padding: 6px 16px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 1px;
+      transition: all 0.2s;
+    }
+
+    .lang-btn:hover {
+      background: var(--surface3);
+      border-color: var(--gold-dim);
+    }
+
+    /* HERO */
+    .hero {
+      text-align: center;
+      padding: 80px 24px 56px;
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--gold);
+      letter-spacing: 3px;
+      border: 1px solid var(--gold-dim);
+      background: rgba(201,168,76,0.05);
+      padding: 8px 20px;
+      border-radius: 100px;
+      margin-bottom: 32px;
+    }
+
+    .hero-tag::before { content: "✦"; }
+    .hero-tag::after  { content: "✦"; }
+
+    h1 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: clamp(36px, 6vw, 64px);
+      font-weight: 600;
+      line-height: 1.1;
+      margin-bottom: 20px;
+      background: linear-gradient(135deg, var(--text) 30%, var(--gold));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p {
+      font-size: 16px;
+      color: var(--text2);
+      line-height: 1.8;
+      margin-bottom: 48px;
+      font-weight: 300;
+    }
+
+    /* DIVIDER */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .divider-line { flex: 1; height: 1px; background: var(--border); }
+    .divider-text { font-size: 10px; color: var(--text3); letter-spacing: 2px; font-family: 'JetBrains Mono', monospace; }
+
+    /* SEARCH AREA */
+    .search-area {
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    .search-box {
+      display: flex;
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: 14px;
+      overflow: hidden;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .search-box:focus-within {
+      border-color: var(--gold-dim);
+      box-shadow: 0 0 0 3px rgba(201,168,76,0.08);
+    }
+
+    .search-icon {
+      padding: 0 18px;
+      display: flex;
+      align-items: center;
+      color: var(--gold-dim);
+      font-size: 18px;
+    }
+
+    .search-box input {
+      flex: 1;
+      background: none;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 16px;
+      padding: 18px 0;
+    }
+
+    .search-box input::placeholder { color: var(--text3); }
+
+    .analyze-btn {
+      background: linear-gradient(135deg, #8a6e2a, var(--gold));
+      color: #06080d;
+      border: none;
+      padding: 0 28px;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: 'Inter', sans-serif;
+      cursor: pointer;
+      letter-spacing: 1px;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .analyze-btn:hover { filter: brightness(1.1); }
+    .analyze-btn:disabled { background: var(--surface2); color: var(--text3); cursor: not-allowed; filter: none; }
+
+    .examples {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    .chip {
+      font-size: 12px;
+      color: var(--text3);
+      border: 1px solid var(--border);
+      padding: 5px 14px;
+      border-radius: 100px;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .chip:hover { color: var(--gold); border-color: var(--gold-dim); }
+
+    /* BACKTEST SECTION */
+    .backtest-toggle {
+      margin-top: 24px;
+      text-align: center;
+    }
+
+    .backtest-link {
+      font-size: 12px;
+      color: var(--text3);
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      transition: color 0.2s;
+    }
+
+    .backtest-link:hover { color: var(--gold); }
+
+    .backtest-panel {
+      display: none;
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 16px;
+    }
+
+    .backtest-panel.show { display: block; }
+
+    .backtest-label {
+      font-size: 11px;
+      color: var(--gold);
+      letter-spacing: 2px;
+      font-family: 'JetBrains Mono', monospace;
+      margin-bottom: 12px;
+    }
+
+    .backtest-inputs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .backtest-inputs input {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      padding: 10px 14px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      outline: none;
+      width: 100%;
+      transition: border-color 0.2s;
+    }
+
+    .backtest-inputs input:focus { border-color: var(--gold-dim); }
+    .backtest-note {
+      font-size: 11px;
+      color: var(--text3);
+      margin-top: 10px;
+      line-height: 1.6;
+    }
+
+    /* STATS ROW */
+    .stats-row {
+      display: flex;
+      gap: 32px;
+      justify-content: center;
+      margin-top: 56px;
+      flex-wrap: wrap;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-num {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 32px;
+      font-weight: 600;
+      color: var(--gold-light);
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: var(--text3);
+      letter-spacing: 2px;
+      margin-top: 2px;
+    }
+
+    /* LOADING */
+    #loading {
+      display: none;
+      max-width: 680px;
+      margin: 48px auto;
+      padding: 0 24px;
+    }
+
+    .loading-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 40px;
+    }
+
+    .loading-asset {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 28px;
+      color: var(--gold-light);
+      margin-bottom: 8px;
+    }
+
+    .loading-subtitle {
+      font-size: 13px;
+      color: var(--text3);
+      font-family: 'JetBrains Mono', monospace;
+      margin-bottom: 32px;
+    }
+
+    .loading-steps { display: flex; flex-direction: column; gap: 16px; }
+
+    .lstep {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-size: 14px;
+      color: var(--text3);
+    }
+
+    .lstep.active { color: var(--text); }
+    .lstep.done   { color: var(--green); }
+
+    .lstep-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 13px;
+      flex-shrink: 0;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .lstep.active .lstep-icon { border-color: var(--gold-dim); background: rgba(201,168,76,0.08); animation: spin 1.5s linear infinite; }
+    .lstep.done   .lstep-icon { border-color: var(--green); background: rgba(46,204,113,0.08); }
+
+    /* RESULTS */
+    #results {
+      display: none;
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 0 24px 100px;
+    }
+
+    /* VERDICT */
+    .verdict-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 36px;
+      margin-bottom: 20px;
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 36px;
+      align-items: center;
+    }
+
+    .verdict-badge {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 22px;
+      font-weight: 700;
+      padding: 18px 28px;
+      border-radius: 14px;
+      text-align: center;
+      letter-spacing: 1px;
+      min-width: 160px;
+    }
+
+    .vSTRONG-BUY  { background: rgba(46,204,113,0.08);  border: 2px solid #2ecc71; color: #2ecc71; }
+    .vBUY         { background: rgba(46,204,113,0.05);  border: 2px solid #58d68d; color: #58d68d; }
+    .vHOLD        { background: rgba(243,156,18,0.08);  border: 2px solid #f39c12; color: #f39c12; }
+    .vSELL        { background: rgba(231,76,60,0.05);   border: 2px solid #e77e6e; color: #e77e6e; }
+    .vSTRONG-SELL { background: rgba(231,76,60,0.08);   border: 2px solid #e74c3c; color: #e74c3c; }
+
+    .backtest-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(52,152,219,0.1);
+      border: 1px solid rgba(52,152,219,0.3);
+      color: #3498db;
+      font-size: 11px;
+      padding: 4px 12px;
+      border-radius: 100px;
+      font-family: 'JetBrains Mono', monospace;
+      margin-bottom: 8px;
+    }
+
+    .verdict-info h2 {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 26px;
+      font-weight: 600;
+      margin-bottom: 10px;
+      color: var(--gold-light);
+    }
+
+    .verdict-info p { color: var(--text2); line-height: 1.8; font-size: 14px; }
+
+    .score-ring {
+      width: 88px; height: 88px;
+      border-radius: 50%;
+      background: conic-gradient(var(--gold) calc(var(--pct) * 1%), var(--surface3) 0);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .score-inner {
+      width: 68px; height: 68px;
+      border-radius: 50%;
+      background: var(--surface);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .score-num   { font-size: 22px; font-weight: 700; color: var(--gold-light); line-height: 1; }
+    .score-lbl   { font-size: 9px; color: var(--text3); letter-spacing: 1px; }
+
+    /* SECTIONS */
+    .section { margin-bottom: 20px; }
+
+    .section-header {
+      font-size: 11px;
+      color: var(--gold);
+      letter-spacing: 3px;
+      font-family: 'JetBrains Mono', monospace;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .section-header::after { content: ""; flex: 1; height: 1px; background: var(--border); }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+    }
+
+    /* CONSENSUS BAR */
+    .cons-bar {
+      height: 10px;
+      border-radius: 5px;
+      overflow: hidden;
+      display: flex;
+      margin: 14px 0;
+    }
+
+    .cb-buy  { background: linear-gradient(90deg, #27ae60, #2ecc71); }
+    .cb-hold { background: linear-gradient(90deg, #e67e22, #f39c12); }
+    .cb-sell { background: linear-gradient(90deg, #c0392b, #e74c3c); }
+
+    .cons-labels { display: flex; gap: 20px; }
+    .cons-label  { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text2); }
+    .cons-dot    { width: 10px; height: 10px; border-radius: 50%; }
+
+    /* GRID */
+    .g3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; }
+    .g2 { display: grid; grid-template-columns: 1fr 1fr;       gap: 16px; }
+
+    .mini-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 20px;
+    }
+
+    .mc-label { font-size: 10px; color: var(--text3); letter-spacing: 2px; font-family: 'JetBrains Mono', monospace; margin-bottom: 8px; }
+    .mc-value { font-size: 13px; color: var(--text); line-height: 1.6; }
+
+    /* SCENARIOS */
+    .scenarios { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; }
+
+    .scenario {
+      background: var(--surface2);
+      border-radius: 12px;
+      padding: 18px;
+    }
+
+    .sc-name { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+    .sc-prob { font-size: 11px; color: var(--text3); font-family: 'JetBrains Mono', monospace; margin-bottom: 10px; }
+    .sc-desc { font-size: 12px; color: var(--text2); line-height: 1.7; }
+    .sc-bull { border-left: 3px solid #2ecc71; }
+    .sc-base { border-left: 3px solid #3498db; }
+    .sc-bear { border-left: 3px solid #e74c3c; }
+
+    /* ARCHETYPES GRID */
+    .arch-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 16px;
+    }
+
+    .arch-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      transition: transform 0.2s, border-color 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .arch-card::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--accent-color, var(--gold-dim));
+    }
+
+    .arch-card:hover { transform: translateY(-3px); border-color: var(--border2); }
+
+    .arch-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 14px; }
+    .arch-emoji  { font-size: 22px; margin-bottom: 4px; }
+    .arch-name   { font-family: 'Cormorant Garamond', serif; font-size: 17px; font-weight: 600; color: var(--text); }
+    .arch-type   { font-size: 10px; color: var(--text3); letter-spacing: 1px; font-family: 'JetBrains Mono', monospace; }
+
+    .dec-badge {
+      font-size: 11px;
+      font-weight: 700;
+      font-family: 'JetBrains Mono', monospace;
+      padding: 5px 12px;
+      border-radius: 6px;
+      letter-spacing: 1px;
+    }
+
+    .dBUY  { background: rgba(46,204,113,0.1);  border: 1px solid #2ecc71; color: #2ecc71; }
+    .dSELL { background: rgba(231,76,60,0.1);   border: 1px solid #e74c3c; color: #e74c3c; }
+    .dHOLD { background: rgba(243,156,18,0.1);  border: 1px solid #f39c12; color: #f39c12; }
+
+    .conf-bar  { height: 2px; background: var(--border); border-radius: 1px; margin-bottom: 12px; }
+    .conf-fill { height: 100%; border-radius: 1px; }
+
+    .arch-target  { font-size: 11px; color: #3498db; font-family: 'JetBrains Mono', monospace; margin-bottom: 10px; }
+    .arch-thesis  { font-size: 12px; color: var(--text2); line-height: 1.7; border-top: 1px solid var(--border); padding-top: 12px; }
+    .arch-risk    { font-size: 11px; color: #e74c3c; margin-top: 8px; }
+    .arch-horizon { font-size: 11px; color: var(--text3); margin-top: 6px; font-family: 'JetBrains Mono', monospace; }
+
+    /* CROWD */
+    .crowd-groups { display: flex; flex-direction: column; gap: 10px; margin-top: 16px; }
+    .cgroup { display: grid; grid-template-columns: 180px 1fr 80px; align-items: center; gap: 14px; font-size: 12px; }
+    .cg-name { color: var(--text2); }
+    .cg-bar-wrap { height: 4px; background: var(--border); border-radius: 2px; overflow: hidden; }
+    .cg-bar-fill { height: 100%; border-radius: 2px; }
+
+    /* METRICS */
+    .metrics-list { display: flex; flex-direction: column; gap: 10px; margin-top: 12px; }
+    .metric-row { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text2); }
+    .metric-num { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--gold-dim); width: 20px; }
+
+    /* NEWS */
+    .news-item { padding: 14px 0; border-bottom: 1px solid var(--border); }
+    .news-item:last-child { border-bottom: none; }
+    .news-title { font-size: 13px; font-weight: 500; margin-bottom: 5px; }
+    .news-snippet { font-size: 12px; color: var(--text2); line-height: 1.7; }
+    .news-meta { font-size: 11px; color: var(--text3); margin-top: 4px; font-family: 'JetBrains Mono', monospace; }
+
+    /* ERROR */
+    .error-box {
+      background: rgba(231,76,60,0.08);
+      border: 1px solid rgba(231,76,60,0.3);
+      border-radius: 12px;
+      padding: 16px 20px;
+      color: #e74c3c;
+      font-size: 13px;
+      max-width: 680px;
+      margin: 24px auto;
+    }
+
+    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.3; } }
+    @keyframes spin  { to { transform: rotate(360deg); } }
+
+    /* RTL support */
+    body.rtl { direction: rtl; font-family: 'Inter', 'Segoe UI', Tahoma, sans-serif; }
+    body.rtl .section-header::after { display: none; }
+    body.rtl .section-header::before { content: ""; flex: 1; height: 1px; background: var(--border); }
+
+    @media (max-width: 768px) {
+      nav { padding: 14px 20px; }
+      .hero { padding: 48px 20px 36px; }
+      .verdict-card { grid-template-columns: 1fr; text-align: center; gap: 20px; }
+      .g3, .g2, .scenarios, .backtest-inputs { grid-template-columns: 1fr; }
+      #results { padding: 0 16px 60px; }
+      .cgroup { grid-template-columns: 130px 1fr 60px; }
+    }
+  </style>
 </head>
 <body>
 
-<div class="container">
-  <header>
-    <div class="header-inner">
-      <div class="logo-block">
-        <div class="logo-emblem">P</div>
-        <div class="logo-text">
-          <h1>The Pantheon</h1>
-          <p>مجلس الاستثمار الذكي</p>
-        </div>
-      </div>
-      <div class="header-badge">1000 AGENT COUNCIL</div>
+<nav>
+  <div class="logo">
+    <div class="logo-icon">🏛️</div>
+    <div>
+      <div class="logo-text">The Pantheon</div>
+      <div class="logo-sub" id="nav-sub">INVESTMENT INTELLIGENCE</div>
     </div>
-  </header>
+  </div>
+  <div class="nav-right">
+    <button class="lang-btn" onclick="toggleLang()" id="langBtn">عربي</button>
+  </div>
+</nav>
 
-  <!-- HERO -->
-  <div class="hero">
-    <div class="hero-tag">AI Investment Intelligence</div>
-    <h2>قرار واحد يحتاج<br><span>ألف عقل</span></h2>
-    <p>اكتب اسم أي سهم أو عملة أو صندوق، وسيقوم مجلس الـ 1000 خبير بتحليل السوق وإصدار الحكم.</p>
+<div class="hero">
+  <div class="hero-tag" id="hero-tag">1000 AGENT SIMULATION</div>
+  <h1 id="hero-title">What should you<br/>invest in today?</h1>
+  <p id="hero-desc">Enter any stock, crypto, fund, or currency. Our AI engine simulates 1,000 investors — each with a unique philosophy and strategy — and delivers a complete intelligence report.</p>
 
+  <div class="search-area">
     <div class="search-box">
-      <div class="search-row">
-        <input type="text" id="assetInput" placeholder="مثال: NVIDIA، Bitcoin، ذهب، Tesla..." />
-        <button class="search-btn" id="analyzeBtn" onclick="startAnalysis()">تحليل</button>
+      <div class="search-icon">◈</div>
+      <input
+        type="text"
+        id="assetInput"
+        placeholder="NVIDIA, Bitcoin, Gold, S&P 500..."
+        onkeydown="if(event.key==='Enter') analyze()"
+      />
+      <button class="analyze-btn" id="analyzeBtn" onclick="analyze()">
+        <span id="btn-text">ANALYZE →</span>
+      </button>
+    </div>
+
+    <div class="examples" id="examples-row">
+      <span class="chip" onclick="q('NVIDIA')">NVIDIA</span>
+      <span class="chip" onclick="q('Bitcoin')">Bitcoin</span>
+      <span class="chip" onclick="q('Apple')">Apple</span>
+      <span class="chip" onclick="q('Gold')">Gold</span>
+      <span class="chip" onclick="q('Tesla')">Tesla</span>
+      <span class="chip" onclick="q('S&P 500')">S&P 500</span>
+    </div>
+
+    <div class="backtest-toggle">
+      <span class="backtest-link" onclick="toggleBacktest()" id="backtest-link">
+        🕐 Test on historical period (Backtesting)
+      </span>
+    </div>
+
+    <div id="backtestPanel" class="backtest-panel">
+      <div class="backtest-label" id="bt-label">SELECT TIME PERIOD FOR ANALYSIS</div>
+      <div class="backtest-inputs">
+        <input type="date" id="dateFrom" placeholder="From date"/>
+        <input type="date" id="dateTo"   placeholder="To date"/>
       </div>
-      <div class="suggestions">
-        <span class="sug-chip" onclick="setAsset('NVIDIA')">NVIDIA</span>
-        <span class="sug-chip" onclick="setAsset('Bitcoin')">Bitcoin</span>
-        <span class="sug-chip" onclick="setAsset('Tesla')">Tesla</span>
-        <span class="sug-chip" onclick="setAsset('ذهب')">ذهب</span>
-        <span class="sug-chip" onclick="setAsset('Saudi Aramco')">Saudi Aramco</span>
+      <div class="backtest-note" id="bt-note">
+        💡 Example: Set NVIDIA + March 2024 dates → Compare the AI's prediction with what actually happened after that period.
       </div>
     </div>
   </div>
 
-  <!-- PROGRESS -->
-  <div id="progress-section">
-    <div class="progress-header">
-      <h3>ANALYSIS IN PROGRESS</h3>
-      <span class="progress-pct" id="progressPct">0%</span>
-    </div>
-    <div class="progress-bar-track">
-      <div class="progress-bar-fill" id="progressBar"></div>
-    </div>
-    <div class="progress-msg" id="progressMsg">جارٍ التحضير...</div>
-    <div class="live-agents" id="liveAgents"></div>
+  <div class="stats-row">
+    <div class="stat"><div class="stat-num">10</div><div class="stat-label" id="stat1">ARCHETYPES</div></div>
+    <div class="stat"><div class="stat-num">990</div><div class="stat-label" id="stat2">CROWD INVESTORS</div></div>
+    <div class="stat"><div class="stat-num">∞</div><div class="stat-label" id="stat3">ASSETS COVERED</div></div>
   </div>
+</div>
 
-  <!-- RESULTS -->
-  <div id="results-section">
+<!-- LOADING -->
+<div id="loading">
+  <div class="loading-card">
+    <div class="loading-asset" id="loadingAsset">NVIDIA</div>
+    <div class="loading-subtitle" id="loadingSubtitle">Initiating 1,000 agent simulation...</div>
+    <div class="loading-steps">
+      <div class="lstep" id="ls1"><div class="lstep-icon">1</div><span id="lt1">Fetching latest market news & data</span></div>
+      <div class="lstep" id="ls2"><div class="lstep-icon">2</div><span id="lt2">Running 10 expert archetype simulations</span></div>
+      <div class="lstep" id="ls3"><div class="lstep-icon">3</div><span id="lt3">Simulating 990 investor crowd behaviors</span></div>
+      <div class="lstep" id="ls4"><div class="lstep-icon">4</div><span id="lt4">Generating intelligence report</span></div>
+    </div>
+  </div>
+</div>
 
+<!-- ERROR -->
+<div id="errorBox" style="display:none; padding:0 24px;">
+  <div class="error-box" id="errorMsg"></div>
+</div>
+
+<!-- RESULTS -->
+<div id="results"></div>
+
+<script>
+// ─── TRANSLATIONS ─────────────────────────────────────────────────────────────
+const T = {
+  en: {
+    navSub: "INVESTMENT INTELLIGENCE",
+    heroTag: "1000 AGENT SIMULATION",
+    heroTitle: "What should you<br/>invest in today?",
+    heroDesc: "Enter any stock, crypto, fund, or currency. Our AI engine simulates 1,000 investors — each with a unique philosophy and strategy — and delivers a complete intelligence report.",
+    btnText: "ANALYZE →",
+    btLink: "🕐 Test on historical period (Backtesting)",
+    btLabel: "SELECT TIME PERIOD FOR ANALYSIS",
+    btNote: "💡 Example: Set NVIDIA + March 2024 dates → Compare the AI's prediction with what actually happened after that period.",
+    stat1: "ARCHETYPES", stat2: "CROWD INVESTORS", stat3: "ASSETS COVERED",
+    lt1: "Fetching latest market news & data",
+    lt2: "Running 10 expert archetype simulations",
+    lt3: "Simulating 990 investor crowd behaviors",
+    lt4: "Generating intelligence report",
+    loadingSub: "Initiating 1,000 agent simulation...",
+    backtestBadge: "📅 BACKTEST MODE",
+    sConsensus: "ANALYST CONSENSUS",
+    sEntry: "ENTRY STRATEGY", sStop: "STOP LOSS", sHorizon: "TIME HORIZON",
+    sOpportunity: "TOP OPPORTUNITY", sRisk: "TOP RISK",
+    sScenarios: "SCENARIOS",
+    sBull: "Bull Case", sBase: "Base Case", sBear: "Bear Case",
+    sMetrics: "KEY METRICS TO WATCH",
+    sExperts: "EXPERT ARCHETYPES",
+    sCrowd: "CROWD SIMULATION — 990 INVESTORS",
+    crowdDec: "CROWD DECISION", crowdSent: "SENTIMENT", herdRisk: "HERD RISK",
+    sNews: "LATEST NEWS & SOURCES",
+    score: "SCORE",
+    buy: "BUY", sell: "SELL", hold: "HOLD",
+    confidence: "CONFIDENCE",
+    target: "TARGET", risk: "RISK", horizon: "HORIZON",
+    probability: "probability",
+  },
+  ar: {
+    navSub: "ذكاء استثماري",
+    heroTag: "محاكاة ١٠٠٠ مستثمر",
+    heroTitle: "في ماذا تستثمر<br/>اليوم؟",
+    heroDesc: "أدخل اسم أي سهم أو عملة رقمية أو صندوق. محركنا يحاكي ١٠٠٠ مستثمر — كل واحد بفلسفة وأسلوب مختلف — ويُخرج لك تقرير استخباراتي شامل.",
+    btnText: "← تحليل",
+    btLink: "🕐 اختبار على فترة تاريخية (Backtesting)",
+    btLabel: "اختر الفترة الزمنية للتحليل",
+    btNote: "💡 مثال: ضع NVIDIA + تواريخ مارس 2024 ← وقارن توقع الذكاء الاصطناعي بما حصل فعلاً بعدها.",
+    stat1: "أرشيتايب", stat2: "مستثمر جماهيري", stat3: "أصول متاحة",
+    lt1: "جلب آخر الأخبار والبيانات السوقية",
+    lt2: "تشغيل ١٠ محاكاة خبراء",
+    lt3: "محاكاة سلوك ٩٩٠ مستثمر",
+    lt4: "توليد تقرير الاستخبارات",
+    loadingSub: "بدء محاكاة ١٠٠٠ مستثمر...",
+    backtestBadge: "📅 وضع الاختبار التاريخي",
+    sConsensus: "إجماع المحللين",
+    sEntry: "استراتيجية الدخول", sStop: "وقف الخسارة", sHorizon: "أفق الاستثمار",
+    sOpportunity: "أكبر فرصة", sRisk: "أكبر خطر",
+    sScenarios: "السيناريوهات",
+    sBull: "حالة التفاؤل", sBase: "الحالة الأساسية", sBear: "حالة التشاؤم",
+    sMetrics: "مؤشرات يجب متابعتها",
+    sExperts: "تحليل الخبراء",
+    sCrowd: "محاكاة الجماهير — ٩٩٠ مستثمر",
+    crowdDec: "قرار الجماهير", crowdSent: "المزاج العام", herdRisk: "خطر القطيع",
+    sNews: "آخر الأخبار والمصادر",
+    score: "نقاط",
+    buy: "شراء", sell: "بيع", hold: "انتظار",
+    confidence: "ثقة",
+    target: "الهدف", risk: "الخطر", horizon: "الأفق",
+    probability: "احتمالية",
+  }
+};
+
+let lang = "en";
+
+function t(key) { return T[lang][key] || key; }
+
+function toggleLang() {
+  lang = lang === "en" ? "ar" : "en";
+  document.getElementById("langBtn").textContent = lang === "en" ? "عربي" : "English";
+  document.body.classList.toggle("rtl", lang === "ar");
+  document.documentElement.lang = lang;
+  applyTranslations();
+}
+
+function applyTranslations() {
+  document.getElementById("nav-sub").textContent    = t("navSub");
+  document.getElementById("hero-tag").textContent   = t("heroTag");
+  document.getElementById("hero-title").innerHTML   = t("heroTitle");
+  document.getElementById("hero-desc").textContent  = t("heroDesc");
+  document.getElementById("btn-text").textContent   = t("btnText");
+  document.getElementById("backtest-link").textContent = t("btLink");
+  document.getElementById("bt-label").textContent   = t("btLabel");
+  document.getElementById("bt-note").textContent    = t("btNote");
+  document.getElementById("stat1").textContent      = t("stat1");
+  document.getElementById("stat2").textContent      = t("stat2");
+  document.getElementById("stat3").textContent      = t("stat3");
+}
+
+// ─── UI HELPERS ───────────────────────────────────────────────────────────────
+function q(name) {
+  document.getElementById("assetInput").value = name;
+  analyze();
+}
+
+let backtestOpen = false;
+function toggleBacktest() {
+  backtestOpen = !backtestOpen;
+  document.getElementById("backtestPanel").classList.toggle("show", backtestOpen);
+}
+
+function setStep(n, status) {
+  const el = document.getElementById("ls" + n);
+  el.className = "lstep " + status;
+  const icon = el.querySelector(".lstep-icon");
+  if (status === "done")   icon.textContent = "✓";
+  else if (status === "active") icon.textContent = "⟳";
+  else icon.textContent = n;
+}
+
+// ─── ANALYZE ─────────────────────────────────────────────────────────────────
+async function analyze() {
+  const asset = document.getElementById("assetInput").value.trim();
+  if (!asset) return;
+
+  const dateFrom = document.getElementById("dateFrom").value;
+  const dateTo   = document.getElementById("dateTo").value;
+  const isBacktest = dateFrom && dateTo;
+
+  document.getElementById("analyzeBtn").disabled = true;
+  document.getElementById("loading").style.display = "block";
+  document.getElementById("results").style.display = "none";
+  document.getElementById("errorBox").style.display = "none";
+
+  document.getElementById("loadingAsset").textContent   = asset;
+  document.getElementById("loadingSubtitle").textContent = t("loadingSub");
+  document.getElementById("lt1").textContent = t("lt1");
+  document.getElementById("lt2").textContent = t("lt2");
+  document.getElementById("lt3").textContent = t("lt3");
+  document.getElementById("lt4").textContent = t("lt4");
+
+  setStep(1,"active"); setStep(2,""); setStep(3,""); setStep(4,"");
+  setTimeout(() => { setStep(1,"done"); setStep(2,"active"); }, 3000);
+  setTimeout(() => { setStep(2,"done"); setStep(3,"active"); }, 9000);
+  setTimeout(() => { setStep(3,"done"); setStep(4,"active"); }, 15000);
+
+  try {
+    const res = await fetch("/api/analyze", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ asset, dateFrom: dateFrom || null, dateTo: dateTo || null }),
+    });
+
+    const data = await res.json();
+    if (data.error) throw new Error(data.error);
+
+    setStep(4,"done");
+    setTimeout(() => {
+      document.getElementById("loading").style.display = "none";
+      renderResults(data, isBacktest);
+    }, 600);
+
+  } catch (err) {
+    document.getElementById("loading").style.display = "none";
+    document.getElementById("errorBox").style.display = "block";
+    document.getElementById("errorMsg").textContent = "⚠ " + err.message;
+  } finally {
+    document.getElementById("analyzeBtn").disabled = false;
+  }
+}
+
+// ─── RENDER ───────────────────────────────────────────────────────────────────
+const COLORS = {
+  macro_fortress:"#60a5fa", alpha_hunter:"#34d399", infinite_horizon:"#fbbf24",
+  cycle_reader:"#a78bfa",   signal_engine:"#fb7185", value_oracle:"#f59e0b",
+  reflexive_mind:"#2dd4bf", the_skeptic:"#f87171",   momentum_guardian:"#818cf8",
+  the_disruptor:"#f472b6"
+};
+
+function sentimentColor(s) {
+  if (s >= 60) return "#2ecc71";
+  if (s >= 40) return "#f39c12";
+  return "#e74c3c";
+}
+
+function dl(d) {
+  if (d === "BUY")  return t("buy");
+  if (d === "SELL") return t("sell");
+  return t("hold");
+}
+
+function renderResults(data, isBacktest) {
+  const { asset, dateFrom, dateTo, news, archetypes, crowd, report: r } = data;
+  const vClass = "v" + r.verdict.replace(/ /g,"-");
+  const vLabel = r.verdict;
+
+  const html = `
     <!-- VERDICT -->
-    <div class="section-title">الحكم النهائي</div>
-    <div class="verdict-card" id="verdictCard">
-      <div class="verdict-grid">
-        <div>
-          <div class="verdict-label">قرار المجلس</div>
-          <div class="verdict-big" id="verdictText">—</div>
-          <div class="conviction-badge" id="convictionBadge">—</div>
-        </div>
-        <div>
-          <div class="verdict-label" style="margin-bottom:14px;">توزيع التوصية</div>
-          <div class="allocation-bars">
-            <div class="alloc-row">
-              <span class="alloc-label">شراء</span>
-              <div class="alloc-track"><div class="alloc-fill buy" id="allocBuy"></div></div>
-              <span class="alloc-pct" id="allocBuyPct">0%</span>
-            </div>
-            <div class="alloc-row">
-              <span class="alloc-label">احتفاظ</span>
-              <div class="alloc-track"><div class="alloc-fill hold" id="allocHold"></div></div>
-              <span class="alloc-pct" id="allocHoldPct">0%</span>
-            </div>
-            <div class="alloc-row">
-              <span class="alloc-label">بيع</span>
-              <div class="alloc-track"><div class="alloc-fill sell" id="allocSell"></div></div>
-              <span class="alloc-pct" id="allocSellPct">0%</span>
-            </div>
-          </div>
-        </div>
-        <div style="text-align:center;">
-          <div class="verdict-label" style="margin-bottom:8px;">مستوى المخاطرة</div>
-          <div id="riskBadge" class="risk-badge">—</div>
-          <div style="margin-top:16px;">
-            <div class="verdict-label">الأفق الزمني</div>
-            <div style="font-family:'Cinzel',serif; font-size:14px; color:var(--white); margin-top:4px;" id="timeHorizon">—</div>
-          </div>
-        </div>
+    <div class="verdict-card">
+      <div>
+        ${isBacktest ? `<div class="backtest-badge">${t("backtestBadge")} ${dateFrom} → ${dateTo}</div>` : ""}
+        <div class="verdict-badge ${vClass}">${vLabel}</div>
       </div>
-      <div class="verdict-summary" id="verdictSummary"></div>
-      <div class="cases-grid">
-        <div class="case-card bull">
-          <div class="case-label">🟢 السيناريو الإيجابي</div>
-          <div class="case-text" id="bullCase"></div>
-        </div>
-        <div class="case-card bear">
-          <div class="case-label">🔴 السيناريو السلبي</div>
-          <div class="case-text" id="bearCase"></div>
+      <div class="verdict-info">
+        <h2>${asset}</h2>
+        <p>${r.summary}</p>
+      </div>
+      <div>
+        <div class="score-ring" style="--pct:${r.score}">
+          <div class="score-inner">
+            <div class="score-num">${r.score}</div>
+            <div class="score-lbl">${t("score")}</div>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- STAR AGENTS -->
-    <div class="section-title">آراء خبراء المجلس العشرة</div>
-    <div class="agents-grid" id="agentsGrid"></div>
-
-    <!-- CROWD -->
-    <div class="crowd-section">
-      <div class="section-title">نبض الـ 990 مستثمر</div>
-      <div class="crowd-summary" id="crowdSummary">
-        <div class="crowd-big g"><span id="crowdBuy">—</span>شراء</div>
-        <div class="crowd-divider"></div>
-        <div class="crowd-big a"><span id="crowdHold">—</span>احتفاظ</div>
-        <div class="crowd-divider"></div>
-        <div class="crowd-big r"><span id="crowdSell">—</span>بيع</div>
-        <div class="crowd-divider"></div>
-        <div class="crowd-text" id="crowdText"></div>
+    <!-- CONSENSUS -->
+    <div class="section">
+      <div class="section-header">${t("sConsensus")}</div>
+      <div class="card">
+        <div class="cons-bar">
+          <div class="cb-buy"  style="width:${r.buyPercentage}%"></div>
+          <div class="cb-hold" style="width:${r.holdPercentage}%"></div>
+          <div class="cb-sell" style="width:${r.sellPercentage}%"></div>
+        </div>
+        <div class="cons-labels">
+          <div class="cons-label"><div class="cons-dot" style="background:#2ecc71"></div>${r.buyPercentage}% ${t("buy")}</div>
+          <div class="cons-label"><div class="cons-dot" style="background:#f39c12"></div>${r.holdPercentage}% ${t("hold")}</div>
+          <div class="cons-label"><div class="cons-dot" style="background:#e74c3c"></div>${r.sellPercentage}% ${t("sell")}</div>
+        </div>
       </div>
-      <div class="crowd-batches" id="crowdBatches"></div>
     </div>
 
     <!-- STRATEGY -->
-    <div class="strategy-section">
-      <div class="section-title">استراتيجية الدخول والمتابعة</div>
-      <div class="strategy-grid">
-        <div class="strategy-item">
-          <label>خطة الدخول</label>
-          <p id="entryStrategy"></p>
+    <div class="g3 section">
+      <div class="mini-card"><div class="mc-label">${t("sEntry")}</div><div class="mc-value">${r.entryStrategy}</div></div>
+      <div class="mini-card"><div class="mc-label">${t("sStop")}</div><div class="mc-value">${r.stopLoss}</div></div>
+      <div class="mini-card"><div class="mc-label">${t("sHorizon")}</div><div class="mc-value">${r.timeHorizon}</div></div>
+    </div>
+
+    <!-- OPPORTUNITY / RISK -->
+    <div class="g2 section">
+      <div class="mini-card" style="border-left:3px solid #2ecc71">
+        <div class="mc-label">✦ ${t("sOpportunity")}</div>
+        <div class="mc-value">${r.topOpportunity}</div>
+      </div>
+      <div class="mini-card" style="border-left:3px solid #e74c3c">
+        <div class="mc-label">⚠ ${t("sRisk")}</div>
+        <div class="mc-value">${r.topRisk}</div>
+      </div>
+    </div>
+
+    <!-- SCENARIOS -->
+    <div class="section">
+      <div class="section-header">${t("sScenarios")}</div>
+      <div class="scenarios">
+        ${(r.scenarios||[]).map((s,i)=>`
+          <div class="scenario sc-${i===0?'bull':i===1?'base':'bear'}">
+            <div class="sc-name">${i===0?t("sBull"):i===1?t("sBase"):t("sBear")}</div>
+            <div class="sc-prob">${s.probability}% ${t("probability")}</div>
+            <div class="sc-desc">${s.description}</div>
+          </div>
+        `).join("")}
+      </div>
+    </div>
+
+    <!-- METRICS -->
+    <div class="section">
+      <div class="section-header">${t("sMetrics")}</div>
+      <div class="card">
+        <div class="metrics-list">
+          ${(r.keyMetrics||[]).map((m,i)=>`
+            <div class="metric-row">
+              <div class="metric-num">0${i+1}</div>
+              ${m}
+            </div>
+          `).join("")}
         </div>
-        <div class="strategy-item">
-          <label>المؤشرات الواجب مراقبتها</label>
-          <div class="metrics-list" id="metricsList"></div>
+      </div>
+    </div>
+
+    <!-- ARCHETYPES -->
+    <div class="section">
+      <div class="section-header">${t("sExperts")}</div>
+      <div class="arch-grid">
+        ${archetypes.map(a=>{
+          const color = COLORS[a.id] || "#c9a84c";
+          return `
+            <div class="arch-card" style="--accent-color:${color}">
+              <div class="arch-header">
+                <div>
+                  <div class="arch-emoji">${a.emoji}</div>
+                  <div class="arch-name">${lang==="ar"?a.nameAr:a.name}</div>
+                  <div class="arch-type">${lang==="ar"?a.typeAr:a.type}</div>
+                </div>
+                <div class="dec-badge d${a.decision}">${dl(a.decision)}</div>
+              </div>
+              <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:11px;color:var(--text3)">
+                <span>${t("confidence")}</span>
+                <span style="color:${color}">${a.confidence}%</span>
+              </div>
+              <div class="conf-bar">
+                <div class="conf-fill" style="width:${a.confidence}%;background:${color}"></div>
+              </div>
+              ${a.target ? `<div class="arch-target">◈ ${a.target}</div>` : ""}
+              <div class="arch-thesis">${a.thesis}</div>
+              ${a.keyRisk ? `<div class="arch-risk">⚠ ${a.keyRisk}</div>` : ""}
+              ${a.timeHorizon ? `<div class="arch-horizon">⏱ ${a.timeHorizon}</div>` : ""}
+            </div>
+          `;
+        }).join("")}
+      </div>
+    </div>
+
+    <!-- CROWD -->
+    <div class="section">
+      <div class="section-header">${t("sCrowd")}</div>
+      <div class="card">
+        <div style="display:flex;gap:28px;flex-wrap:wrap;margin-bottom:20px">
+          <div>
+            <div class="mc-label">${t("crowdDec")}</div>
+            <div style="font-size:20px;font-weight:700;color:${crowd.crowdDecision==="BUY"?"#2ecc71":crowd.crowdDecision==="SELL"?"#e74c3c":"#f39c12"}">${dl(crowd.crowdDecision)}</div>
+          </div>
+          <div>
+            <div class="mc-label">${t("crowdSent")}</div>
+            <div style="font-size:20px;font-weight:700;color:${sentimentColor(crowd.crowdSentiment)}">${crowd.crowdSentiment}/100</div>
+          </div>
+          <div>
+            <div class="mc-label">${t("herdRisk")}</div>
+            <div style="font-size:20px;font-weight:700;color:${crowd.herdBehaviorRisk==="HIGH"?"#e74c3c":crowd.herdBehaviorRisk==="MEDIUM"?"#f39c12":"#2ecc71"}">${crowd.herdBehaviorRisk}</div>
+          </div>
         </div>
+        <div class="crowd-groups">
+          ${(crowd.groups||[]).map(g=>`
+            <div class="cgroup">
+              <div class="cg-name">${g.name}</div>
+              <div class="cg-bar-wrap">
+                <div class="cg-bar-fill" style="width:${g.sentiment}%;background:${sentimentColor(g.sentiment)}"></div>
+              </div>
+              <div class="dec-badge d${g.decision}" style="font-size:10px;padding:3px 8px;text-align:center">${dl(g.decision)}</div>
+            </div>
+          `).join("")}
+        </div>
+        ${crowd.crowdInsight?`<div style="margin-top:16px;font-size:13px;color:var(--text2);font-style:italic;border-top:1px solid var(--border);padding-top:14px">✦ ${crowd.crowdInsight}</div>`:""}
       </div>
     </div>
 
     <!-- NEWS -->
-    <div class="news-section">
-      <div class="section-title">أحدث الأخبار المؤثرة</div>
-      <div class="news-list" id="newsList"></div>
-    </div>
-
-  </div>
-
-  <footer>
-    <p>The Pantheon — <span>ليس نصيحة استثمارية</span> — للأغراض التعليمية والتحليلية فقط</p>
-  </footer>
-</div>
-
-<script>
-function setAsset(name) {
-  document.getElementById('assetInput').value = name;
-}
-
-const BATCH_NAMES = {
-  retail_fearful: 'مستثمرون مبتدئون خائفون',
-  retail_greedy: 'مستثمرون متحمسون',
-  institutional_small: 'مديرو صناديق صغيرة',
-  crypto_traders: 'متداولو العملات الرقمية',
-  conservative_savers: 'مدخرون محافظون',
-  emerging_market: 'مستثمرون من الأسواق الناشئة',
-  quant_traders: 'متداولون كميون',
-  esg_investors: 'مستثمرو ESG',
-  day_traders: 'متداولو اليوم',
-  value_hunters: 'صائدو القيمة',
-};
-
-const VERDICTS_AR = { BUY: 'شراء', SELL: 'بيع', HOLD: 'احتفاظ' };
-const CONVICTION_AR = { HIGH: 'ثقة عالية', MEDIUM: 'ثقة متوسطة', LOW: 'ثقة منخفضة' };
-const RISK_AR = { LOW: 'مخاطرة منخفضة', MEDIUM: 'مخاطرة متوسطة', HIGH: 'مخاطرة عالية', EXTREME: 'مخاطرة شديدة' };
-const HORIZON_AR = { SHORT: 'قصير المدى', MEDIUM: 'متوسط المدى', LONG: 'طويل المدى' };
-
-async function startAnalysis() {
-  const asset = document.getElementById('assetInput').value.trim();
-  if (!asset) return;
-
-  const btn = document.getElementById('analyzeBtn');
-  btn.disabled = true;
-  btn.textContent = 'جارٍ التحليل...';
-
-  document.getElementById('progress-section').style.display = 'block';
-  document.getElementById('results-section').style.display = 'none';
-  document.getElementById('liveAgents').innerHTML = '';
-
-  setProgress(0, 'جارٍ الاتصال...');
-
-  try {
-    const response = await fetch('/api/analyze', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ asset }),
-    });
-
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
-    let buffer = '';
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split('\n');
-      buffer = lines.pop();
-
-      for (const line of lines) {
-        if (line.startsWith('data: ')) {
-          try {
-            const data = JSON.parse(line.slice(6));
-            handleEvent(data);
-          } catch {}
-        }
-      }
-    }
-  } catch (err) {
-    setProgress(0, '❌ خطأ: ' + err.message);
-  }
-
-  btn.disabled = false;
-  btn.textContent = 'تحليل';
-}
-
-function setProgress(pct, msg) {
-  document.getElementById('progressBar').style.width = pct + '%';
-  document.getElementById('progressPct').textContent = pct + '%';
-  document.getElementById('progressMsg').textContent = msg;
-}
-
-function handleEvent(data) {
-  setProgress(data.progress || 0, data.message || '');
-
-  if (data.step === 'agent_done' && data.agent) {
-    const chip = document.createElement('div');
-    chip.className = `agent-chip ${data.agent.verdict?.toLowerCase()}`;
-    chip.textContent = `${data.agent.emoji} ${data.agent.agent}`;
-    document.getElementById('liveAgents').appendChild(chip);
-  }
-
-  if (data.step === 'complete' && data.data) {
-    renderResults(data.data);
-  }
-}
-
-function renderResults(data) {
-  document.getElementById('progress-section').style.display = 'none';
-  document.getElementById('results-section').style.display = 'block';
-
-  const v = data.verdict;
-
-  // Verdict
-  const verdictEl = document.getElementById('verdictText');
-  verdictEl.textContent = VERDICTS_AR[v.overall_verdict] || v.overall_verdict;
-  verdictEl.className = `verdict-big ${v.overall_verdict}`;
-
-  const convBadge = document.getElementById('convictionBadge');
-  convBadge.textContent = CONVICTION_AR[v.conviction] || v.conviction;
-  convBadge.className = `conviction-badge ${v.conviction}`;
-
-  // Allocations
-  setTimeout(() => {
-    document.getElementById('allocBuy').style.width = v.buy_allocation + '%';
-    document.getElementById('allocHold').style.width = v.hold_allocation + '%';
-    document.getElementById('allocSell').style.width = v.sell_allocation + '%';
-  }, 100);
-  document.getElementById('allocBuyPct').textContent = v.buy_allocation + '%';
-  document.getElementById('allocHoldPct').textContent = v.hold_allocation + '%';
-  document.getElementById('allocSellPct').textContent = v.sell_allocation + '%';
-
-  // Risk & horizon
-  const riskBadge = document.getElementById('riskBadge');
-  riskBadge.textContent = RISK_AR[v.risk_level] || v.risk_level;
-  riskBadge.className = `risk-badge ${v.risk_level}`;
-  document.getElementById('timeHorizon').textContent = HORIZON_AR[v.time_horizon] || v.time_horizon;
-
-  document.getElementById('verdictSummary').textContent = v.executive_summary;
-  document.getElementById('bullCase').textContent = v.bull_case;
-  document.getElementById('bearCase').textContent = v.bear_case;
-
-  // Star Agents
-  const grid = document.getElementById('agentsGrid');
-  grid.innerHTML = data.starAgents.map(a => `
-    <div class="agent-card">
-      <div class="agent-header">
-        <div class="agent-name-block">
-          <span class="agent-emoji">${a.emoji}</span>
-          <span class="agent-name">${a.agent}</span>
-        </div>
-        <span class="verdict-pill ${a.verdict}">${VERDICTS_AR[a.verdict] || a.verdict}</span>
-      </div>
-      <div class="agent-confidence">
-        <span>ثقة ${a.confidence}%</span>
-        <div class="conf-bar"><div class="conf-fill" style="width:${a.confidence}%"></div></div>
-      </div>
-      <div class="agent-reasoning">${a.reasoning}</div>
-      <div class="agent-risks">
-        <div class="risk-block"><label>أبرز خطر</label><span>${a.key_risk}</span></div>
-        <div class="risk-block"><label>أبرز فرصة</label><span>${a.key_opportunity}</span></div>
+    <div class="section">
+      <div class="section-header">${t("sNews")}</div>
+      <div class="card">
+        ${news.summary?`<div style="font-size:13px;color:var(--text2);line-height:1.8;background:var(--surface2);padding:16px;border-radius:10px;margin-bottom:16px">${news.summary}</div>`:""}
+        ${(news.articles||[]).slice(0,6).map(a=>`
+          <div class="news-item">
+            <div class="news-title">${a.title}</div>
+            <div class="news-snippet">${a.content}</div>
+            <div class="news-meta">${a.date||""} ${a.url?`· ${a.url.slice(0,55)}...`:""}</div>
+          </div>
+        `).join("")}
       </div>
     </div>
-  `).join('');
+  `;
 
-  // Crowd
-  const crowd = data.crowd;
-  const avgBuy = Math.round(crowd.reduce((s, c) => s + c.buy_percent, 0) / crowd.length);
-  const avgSell = Math.round(crowd.reduce((s, c) => s + c.sell_percent, 0) / crowd.length);
-  const avgHold = 100 - avgBuy - avgSell;
-
-  document.getElementById('crowdBuy').textContent = avgBuy + '%';
-  document.getElementById('crowdHold').textContent = avgHold + '%';
-  document.getElementById('crowdSell').textContent = avgSell + '%';
-  document.getElementById('crowdText').textContent = `من مجموع 990 مستثمراً يمثلون شرائح مختلفة من السوق العالمي، ${avgBuy > 50 ? 'الغالبية تميل للشراء' : avgSell > 50 ? 'الغالبية تميل للبيع' : 'الرأي منقسم بين المشاركين'}.`;
-
-  document.getElementById('crowdBatches').innerHTML = crowd.map(c => `
-    <div class="batch-card">
-      <div class="batch-name">${BATCH_NAMES[c.batch] || c.batch}</div>
-      <div class="batch-bar-row">
-        <div class="batch-bar-buy" style="width:${c.buy_percent}%"></div>
-        <div class="batch-bar-hold" style="width:${c.hold_percent}%"></div>
-        <div class="batch-bar-sell" style="width:${c.sell_percent}%"></div>
-      </div>
-      <div class="batch-emotion">المشاعر السائدة: ${c.dominant_emotion}</div>
-    </div>
-  `).join('');
-
-  // Strategy
-  document.getElementById('entryStrategy').textContent = v.entry_strategy;
-  document.getElementById('metricsList').innerHTML = (v.key_metrics_to_watch || []).map(m => `
-    <div class="metric-tag">${m}</div>
-  `).join('');
-
-  // News
-  document.getElementById('newsList').innerHTML = (data.news || []).map((n, i) => `
-    <div class="news-item">
-      <div class="news-index">0${i + 1}</div>
-      <div class="news-content">
-        <div class="news-title">${n.title}</div>
-        <div class="news-snippet">${(n.content || '').substring(0, 120)}...</div>
-        ${n.url ? `<a class="news-link" href="${n.url}" target="_blank">اقرأ المزيد →</a>` : ''}
-      </div>
-    </div>
-  `).join('');
-
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  const el = document.getElementById("results");
+  el.innerHTML = html;
+  el.style.display = "block";
+  window.scrollTo({ top: el.offsetTop - 20, behavior: "smooth" });
 }
-
-document.getElementById('assetInput').addEventListener('keydown', e => {
-  if (e.key === 'Enter') startAnalysis();
-});
 </script>
 </body>
 </html>

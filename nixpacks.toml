@@ -1,2 +1,5 @@
-node_modules/
-.env
+[phases.install]
+cmds = ["npm install"]
+
+[start]
+cmd = "node server.js"

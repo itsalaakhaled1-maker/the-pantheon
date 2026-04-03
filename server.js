@@ -1,3 +1,6 @@
+const fetch = require("node-fetch"); // أضف هذا السطر في أول الملف تماماً
+require("dotenv").config();
+// ... باقي الكود كما هو
 require("dotenv").config();
 const express = require("express");
 const cors    = require("cors");

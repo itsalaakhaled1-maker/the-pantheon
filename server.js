@@ -2,7 +2,7 @@ require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
-const fetch = require("node-fetch");
+// fetch is built-in on Node.js v18+
 
 const app = express();
 app.use(cors());

@@ -8,9 +8,14 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-// ─── GEMINI REST CALL (محسن لمعالجة الـ JSON بشكل أدق) ──────────────────────────
+// ─── GEMINI REST CALL (Stable & Flexible) ─────────────────────────────────────
 async function gemini(prompt, maxTokens = 3000) {
-  const models = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"];
+  // الترتيب حسب الاستقرار لضمان عدم فشل الطلب في Railway
+  const models = [
+    "gemini-1.5-flash",
+    "gemini-1.5-pro",
+    "gemini-1.0-pro"
+  ];
 
   for (const model of models) {
     try {
@@ -20,55 +25,64 @@ async function gemini(prompt, maxTokens = 3000) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: { temperature: 0.7, maxOutputTokens: maxTokens }, // تقليل الـ temperature لزيادة الدقة
+          generationConfig: { temperature: 0.7 } 
         }),
       });
 
-      if (!res.ok) continue;
+      if (!res.ok) {
+        const errData = await res.json();
+        console.error(`   Model ${model} failed:`, errData.error?.message || res.status);
+        continue;
+      }
 
       const data = await res.json();
       const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
       if (!text) continue;
 
-      // تحسين استخراج الـ JSON لإزالة أي نصوص زائدة قد يضيفها الموديل
       const match = text.match(/\{[\s\S]*\}/);
       if (!match) continue;
 
+      console.log(`   ✅ Model ${model} worked!`);
       return JSON.parse(match[0]);
+
     } catch (e) {
-      console.log(`Model ${model} error: ${e.message}`);
+      console.error(`   Error calling ${model}: ${e.message}`);
       continue;
     }
   }
-  throw new Error("All Gemini models failed.");
+
+  throw new Error("All Gemini models failed. Check your API key in Railway Variables.");
 }
 
-// ─── ARCHETYPES (ثابتة كما هي) ────────────────────────────────────────────────
+// ─── 10 ARCHETYPES ────────────────────────────────────────────────────────────
 const ARCHETYPES = [
-  { id: "macro_fortress",    name: "The Macro Fortress",    style: "trillion-dollar institutional committee, systemic risk and macro trends focused" },
-  { id: "alpha_hunter",      name: "The Alpha Hunter",      style: "aggressive investment bank trading desk, seeks information edge and short-term alpha" },
-  { id: "infinite_horizon",  name: "The Infinite Horizon",  style: "world's largest asset manager, thinks in decades, long-term compounding only" },
-  { id: "cycle_reader",      name: "The Cycle Reader",      style: "macro hedge fund analyzing debt cycles and all-weather portfolio positioning" },
-  { id: "signal_engine",     name: "The Signal Engine",     style: "pure quant firm, z-scores and expected value only, no narratives" },
-  { id: "value_oracle",      name: "The Value Oracle",      style: "60-year value investing legend, seeks moats and margin of safety, ignores all noise" },
-  { id: "reflexive_mind",    name: "The Reflexive Mind",    style: "global macro legend using reflexivity theory, bets massively on self-reinforcing trends" },
-  { id: "the_skeptic",       name: "The Skeptic",           style: "deep contrarian who hunts bubbles and overvalued assets, distrusts all Wall Street consensus" },
-  { id: "momentum_guardian", name: "The Momentum Guardian", style: "capital preservation first, follows momentum, cuts losses fast, risk management is religion" },
-  { id: "the_disruptor",     name: "The Disruptor",         style: "visionary innovation investor, 5-year minimum horizon, bets on exponential tech disruption" },
+  { id: "macro_fortress",    name: "The Macro Fortress",    emoji: "🏛️", type: "Institution",         style: "trillion-dollar institutional committee, systemic risk and macro trends focused" },
+  { id: "alpha_hunter",      name: "The Alpha Hunter",      emoji: "🎯", type: "Institution",         style: "aggressive investment bank trading desk, seeks information edge and short-term alpha" },
+  { id: "infinite_horizon",  name: "The Infinite Horizon",  emoji: "🌍", type: "Institution",         style: "world's largest asset manager, thinks in decades, long-term compounding only" },
+  { id: "cycle_reader",      name: "The Cycle Reader",      emoji: "🌊", type: "Institution",         style: "macro hedge fund analyzing debt cycles and all-weather portfolio positioning" },
+  { id: "signal_engine",     name: "The Signal Engine",     emoji: "⚡", type: "Institution",         style: "pure quant firm, z-scores and expected value only, no narratives" },
+  { id: "value_oracle",      name: "The Value Oracle",      emoji: "🧙", type: "Legendary Investor",  style: "60-year value investing legend, seeks moats and margin of safety, ignores all noise" },
+  { id: "reflexive_mind",    name: "The Reflexive Mind",    emoji: "🔮", type: "Legendary Investor",  style: "global macro legend using reflexivity theory, bets massively on self-reinforcing trends" },
+  { id: "the_skeptic",       name: "The Skeptic",           emoji: "🐻", type: "Contrarian",          style: "deep contrarian who hunts bubbles and overvalued assets, distrusts all Wall Street consensus" },
+  { id: "momentum_guardian", name: "The Momentum Guardian", emoji: "📈", type: "Macro Trader",        style: "capital preservation first, follows momentum, cuts losses fast, risk management is religion" },
+  { id: "the_disruptor",     name: "The Disruptor",         emoji: "🚀", type: "Innovation Investor", style: "visionary innovation investor, 5-year minimum horizon, bets on exponential tech disruption" },
 ];
 
-// ─── TAVILY SEARCH (كما هو) ───────────────────────────────────────────────────
+// ─── TAVILY SEARCH (Advanced Depth) ───────────────────────────────────────────
 async function searchNews(asset, dateFrom, dateTo) {
   try {
-    const query = `${asset} stock market analysis and financial performance ${dateFrom || "2025"} ${dateTo || ""}`;
+    const query = dateFrom
+      ? `${asset} stock financial news and performance from ${dateFrom} to ${dateTo}`
+      : `${asset} stock market latest analysis`;
+
     const res = await fetch("https://api.tavily.com/search", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         api_key: process.env.TAVILY_API_KEY,
         query,
-        search_depth: "advanced", // تم تغييره لـ advanced لجلب بيانات أدق
-        max_results: 5,
+        search_depth: "advanced",
+        max_results: 6,
         include_answer: true,
       }),
     });
@@ -76,78 +90,86 @@ async function searchNews(asset, dateFrom, dateTo) {
     return {
       summary: data.answer || "",
       articles: (data.results || []).map(r => ({
-        title: r.title,
-        content: r.content?.slice(0, 500),
-        url: r.url
+        title:   r.title,
+        content: r.content?.slice(0, 400),
+        url:     r.url
       })),
     };
   } catch (e) {
+    console.error("Tavily error:", e.message);
     return { summary: "", articles: [] };
   }
 }
 
-// ─── CALL 1: AGENTS (تعديل الـ Prompt لمنع التنوع الإجباري) ─────────────────────
+// ─── CALL 1: EXPERT ANALYSIS (Objective & Dynamic) ───────────────────────────
 async function runAllAgents(context) {
   const news = context.articles.map((a, i) => `${i+1}. ${a.title}: ${a.content}`).join("\n");
 
-  const prompt = `You are a world-class financial analyst. Analyze ${context.asset} for the period ${context.dateFrom} to ${context.dateTo}.
-  
-CONTEXT: ${context.summary}
-NEWS DATA:
+  const prompt = `Analyze ${context.asset} for the period ${context.dateFrom} to ${context.dateTo}.
+MARKET DATA SUMMARY: ${context.summary}
+NEWS FEED:
 ${news}
 
-INSTRUCTION: Analyze using the style of these 10 archetypes. 
-CRITICAL: Do NOT force variety. If the news is overwhelmingly positive, most should say BUY. If negative, most should say SELL. Be realistic.
+INSTRUCTIONS:
+1. Act as 10 different investment archetypes (styles provided below).
+2. Base your decision (BUY, SELL, or HOLD) strictly on the provided news and your archetype's logic.
+3. CRITICAL: Do NOT force variety. If news is overwhelmingly bullish, most should BUY.
+4. Write unique, 2-sentence theses for each. No placeholders.
 
 ARCHETYPES:
 ${ARCHETYPES.map(a => `- ${a.id}: ${a.style}`).join("\n")}
 
-Return ONLY JSON:
-{"agents":[{"id":"archetype_id","decision":"BUY/SELL/HOLD","confidence":0-100,"thesis":"Detailed 2-sentence analysis referencing specific news.","keyRisk":"Specific risk.","target":"Price target or direction.","timeHorizon":"Horizon."}]}`;
+Return ONLY valid JSON:
+{"agents":[{"id":"archetype_id","decision":"BUY/SELL/HOLD","confidence":60-95,"thesis":"...","keyRisk":"...","target":"...","timeHorizon":"..."}]}`;
 
-  return (await gemini(prompt)).agents || [];
+  const result = await gemini(prompt);
+  return result.agents || [];
 }
 
-// ─── CALL 2: REPORT (تعديل منطق التقرير ليكون أكثر ذكاءً) ──────────────────────
+// ─── CALL 2: REPORT GENERATION (Consensus Driven) ────────────────────────────
 async function runCrowdAndReport(context, agents) {
-  const prompt = `Based on these 10 expert votes: ${JSON.stringify(agents.map(a => a.decision))}
-  And this news: ${context.summary}
+  const votes = agents.map(a => a.decision);
   
-  Generate a final investment report for ${context.asset}.
-  - If consensus is strong, verdict must be "STRONG BUY" or "STRONG SELL".
-  - Score (0-100) should reflect conviction.
-  - NEVER use placeholder text like "perspective on...". Write original insights.
+  const prompt = `Create a final report for ${context.asset} based on these expert votes: ${votes.join(", ")}.
+NEWS CONTEXT: ${context.summary}
 
-  Return ONLY JSON:
-  {
-    "crowd": { "groups": [...], "crowdDecision": "BUY/SELL/HOLD", "crowdSentiment": 0-100, "herdBehaviorRisk": "LOW/MEDIUM/HIGH", "crowdInsight": "..." },
-    "report": { "verdict": "...", "score": 0-100, "summary": "...", "entryStrategy": "...", "stopLoss": "...", "topOpportunity": "...", "topRisk": "...", "scenarios": [...], "keyMetrics": [...], "timeHorizon": "..." }
-  }`;
+REQUIREMENTS:
+- Verdict must be: STRONG BUY, BUY, HOLD, SELL, or STRONG SELL.
+- If majority is BUY, verdict must reflect that.
+- Score (0-100) must reflect the conviction of the majority.
+- Generate realistic crowd sentiment data.
+
+Return ONLY JSON:
+{
+  "crowd": { "groups": [...], "crowdDecision": "...", "crowdSentiment": 0-100, "herdBehaviorRisk": "...", "crowdInsight": "..." },
+  "report": { "verdict": "...", "score": 0-100, "summary": "...", "entryStrategy": "...", "stopLoss": "...", "topOpportunity": "...", "topRisk": "...", "scenarios": [...], "keyMetrics": [...], "timeHorizon": "..." }
+}`;
 
   return await gemini(prompt);
 }
 
-// ─── FALLBACK LOGIC (تعديل نظام الأغلبية لمنع الـ HOLD التلقائي) ────────────────
+// ─── FALLBACK LOGIC (Majority Rule) ───────────────────────────────────────────
 function getFallback(asset, agents) {
-  const votes = agents.map(a => a.decision);
-  const counts = { BUY: 0, SELL: 0, HOLD: 0 };
-  votes.forEach(v => counts[v]++);
+  const buyC  = agents.filter(a => a.decision === "BUY").length;
+  const sellC = agents.filter(a => a.decision === "SELL").length;
+  const holdC = agents.filter(a => a.decision === "HOLD").length;
+  
+  let v = "HOLD";
+  if (buyC > sellC && buyC > holdC) v = "BUY";
+  else if (sellC > buyC && sellC > holdC) v = "SELL";
 
-  // اختيار القرار بناءً على الأغلبية العظمى (Majority Wins)
-  let finalVerdict = "HOLD";
-  if (counts.BUY > counts.SELL && counts.BUY > counts.HOLD) finalVerdict = "BUY";
-  else if (counts.SELL > counts.BUY && counts.SELL > counts.HOLD) finalVerdict = "SELL";
-
-  const score = 50 + (counts.BUY * 5) - (counts.SELL * 5); // معادلة مرنة للسكور
+  const score = 50 + (buyC * 5) - (sellC * 5);
 
   return {
-    crowd: { crowdDecision: finalVerdict, crowdSentiment: score, groups: [] },
-    report: { 
-      verdict: finalVerdict, 
-      score: Math.min(Math.max(score, 10), 95), 
-      summary: `Analysis based on ${counts.BUY} Buy, ${counts.HOLD} Hold, and ${counts.SELL} Sell signals.`,
-      entryStrategy: "Standard entry logic applied.",
-      scenarios: []
+    crowd: { crowdDecision: v, crowdSentiment: score, groups: [], herdBehaviorRisk: "MEDIUM", crowdInsight: "Fallback data used." },
+    report: {
+      verdict: v, score: Math.min(Math.max(score, 10), 95),
+      summary: `Consensus: ${buyC} Buy, ${holdC} Hold, ${sellC} Sell.`,
+      entryStrategy: "Standard position sizing.",
+      stopLoss: "10% trailing.",
+      topOpportunity: "Trend continuation.",
+      topRisk: "Macro shifts.",
+      scenarios: [], keyMetrics: ["Momentum", "Volume"], timeHorizon: "6-12m"
     }
   };
 }
@@ -155,44 +177,46 @@ function getFallback(asset, agents) {
 // ─── MAIN ENDPOINT ────────────────────────────────────────────────────────────
 app.post("/api/analyze", async (req, res) => {
   const { asset, dateFrom, dateTo } = req.body;
+  if (!asset) return res.status(400).json({ error: "Asset name required" });
+
+  console.log(`\n🔍 Pantheon Analysis Started: ${asset}`);
+
   try {
     const newsData = await searchNews(asset, dateFrom, dateTo);
     const context  = { asset, dateFrom, dateTo, ...newsData };
 
     let agentData = await runAllAgents(context);
-    
+
     const archetypeResults = ARCHETYPES.map(a => {
       const d = agentData.find(x => x.id === a.id);
       return {
         ...a,
         decision: d?.decision || "HOLD",
-        confidence: d?.confidence || 50,
-        thesis: d?.thesis || `Analyzing ${asset} through the lens of ${a.name}.`,
-        keyRisk: d?.keyRisk || "Market volatility",
-        target: d?.target || "N/A",
+        confidence: d?.confidence || 65,
+        thesis: d?.thesis || `Standard analysis for ${asset}.`,
+        keyRisk: d?.keyRisk || "Volatility",
+        target: d?.target || "Market",
         timeHorizon: d?.timeHorizon || "Medium Term"
       };
     });
 
-    let result;
+    let crowd, report;
     try {
-      result = await runCrowdAndReport(context, archetypeResults);
+      const combined = await runCrowdAndReport(context, archetypeResults);
+      crowd  = combined.crowd;
+      report = combined.report;
     } catch (e) {
-      result = getFallback(asset, archetypeResults);
+      const fb = getFallback(asset, archetypeResults);
+      crowd = fb.crowd; report = fb.report;
     }
 
-    res.json({
-      asset, dateFrom, dateTo,
-      news: { summary: context.summary, articles: context.articles },
-      archetypes: archetypeResults,
-      crowd: result.crowd,
-      report: result.report
-    });
+    res.json({ asset, news: { summary: context.summary, articles: context.articles }, archetypes: archetypeResults, crowd, report });
 
   } catch (err) {
+    console.error("❌ Error:", err.message);
     res.status(500).json({ error: err.message });
   }
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`🏛️ Pantheon Engine Updated on port ${PORT}`));
+app.listen(PORT, () => console.log(`🏛️  The Pantheon Engine Live on port ${PORT}`));

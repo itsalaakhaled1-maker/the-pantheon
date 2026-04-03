@@ -1,56 +1,81 @@
 require("dotenv").config();
 const express = require("express");
-const cors = require("cors");
-const path = require("path");
+const cors    = require("cors");
+const path    = require("path");
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
-// ─── GEMINI ───────────────────────────────────────────────────────────────────
-async function gemini(prompt, maxTokens = 2000) {
-  const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`;
-  const res = await fetch(url, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: { temperature: 0.7, maxOutputTokens: maxTokens },
-    }),
-  });
-  if (!res.ok) {
-    const err = await res.text();
-    throw new Error(`Gemini ${res.status}: ${err.slice(0, 300)}`);
+// ─── GEMINI REST CALL ─────────────────────────────────────────────────────────
+async function gemini(prompt, maxTokens = 3000) {
+  // Try models in order until one works
+  const models = [
+    "gemini-2.0-flash",
+    "gemini-1.5-flash",
+    "gemini-1.5-pro",
+    "gemini-1.0-pro",
+  ];
+
+  for (const model of models) {
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${process.env.GEMINI_API_KEY}`;
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }] }],
+          generationConfig: { temperature: 0.8, maxOutputTokens: maxTokens },
+        }),
+      });
+
+      if (!res.ok) {
+        const errText = await res.text();
+        console.log(`   Model ${model} failed: ${res.status}`);
+        continue; // try next model
+      }
+
+      const data = await res.json();
+      const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!text) { console.log(`   Model ${model}: empty response`); continue; }
+
+      const match = text.match(/\{[\s\S]*\}/);
+      if (!match) { console.log(`   Model ${model}: no JSON`); continue; }
+
+      console.log(`   ✅ Model ${model} worked!`);
+      return JSON.parse(match[0]);
+
+    } catch (e) {
+      console.log(`   Model ${model} error: ${e.message}`);
+      continue;
+    }
   }
-  const data = await res.json();
-  const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-  if (!text) throw new Error("Empty response");
-  const match = text.match(/\{[\s\S]*\}/);
-  if (!match) throw new Error("No JSON found");
-  return JSON.parse(match[0]);
+
+  throw new Error("All Gemini models failed. Check your API key.");
 }
 
-// ─── ARCHETYPES ───────────────────────────────────────────────────────────────
+// ─── 10 ARCHETYPES ────────────────────────────────────────────────────────────
 const ARCHETYPES = [
-  { id: "macro_fortress",    name: "The Macro Fortress",    nameAr: "القلعة الكبرى",      emoji: "🏛️", type: "Institution",        typeAr: "مؤسسة",          style: "institutional committee managing trillions, focuses on systemic risk and macro trends" },
-  { id: "alpha_hunter",      name: "The Alpha Hunter",      nameAr: "صائد الألفا",         emoji: "🎯", type: "Institution",        typeAr: "مؤسسة",          style: "aggressive trading desk seeking information edge and short-term alpha" },
-  { id: "infinite_horizon",  name: "The Infinite Horizon",  nameAr: "الأفق اللانهائي",    emoji: "🌍", type: "Institution",        typeAr: "مؤسسة",          style: "world's largest asset manager, thinks in decades, long-term compounding only" },
-  { id: "cycle_reader",      name: "The Cycle Reader",      nameAr: "قارئ الدورات",        emoji: "🌊", type: "Institution",        typeAr: "مؤسسة",          style: "macro hedge fund focused on debt cycles and all-weather positioning" },
-  { id: "signal_engine",     name: "The Signal Engine",     nameAr: "محرك الإشارات",       emoji: "⚡", type: "Institution",        typeAr: "مؤسسة",          style: "pure quant firm, processes signals not stories, z-scores and expected value only" },
-  { id: "value_oracle",      name: "The Value Oracle",      nameAr: "عراف القيمة",         emoji: "🧙", type: "Legendary Investor", typeAr: "مستثمر أسطوري", style: "legendary value investor with 60 years experience, ignores noise, seeks moats and margin of safety" },
-  { id: "reflexive_mind",    name: "The Reflexive Mind",    nameAr: "العقل الانعكاسي",    emoji: "🔮", type: "Legendary Investor", typeAr: "مستثمر أسطوري", style: "global macro legend using reflexivity theory, bets on self-reinforcing trends" },
-  { id: "the_skeptic",       name: "The Skeptic",           nameAr: "المشكك",              emoji: "🐻", type: "Contrarian",         typeAr: "عكسي",           style: "contrarian investor who finds bubbles, distrusts consensus, deep independent research" },
-  { id: "momentum_guardian", name: "The Momentum Guardian", nameAr: "حارس الزخم",          emoji: "📈", type: "Macro Trader",       typeAr: "متداول ماكرو",  style: "macro trader for whom capital preservation is religion, follows momentum and cuts losses fast" },
-  { id: "the_disruptor",     name: "The Disruptor",         nameAr: "المدمر الخلاق",       emoji: "🚀", type: "Innovation Investor", typeAr: "مستثمر الابتكار", style: "visionary innovation investor, 5-year minimum horizon, ignores short-term, bets on exponential tech" },
+  { id: "macro_fortress",    name: "The Macro Fortress",    nameAr: "القلعة الكبرى",     emoji: "🏛️", type: "Institution",         typeAr: "مؤسسة",           style: "trillion-dollar institutional committee, systemic risk and macro trends focused" },
+  { id: "alpha_hunter",      name: "The Alpha Hunter",      nameAr: "صائد الألفا",        emoji: "🎯", type: "Institution",         typeAr: "مؤسسة",           style: "aggressive investment bank trading desk, seeks information edge and short-term alpha" },
+  { id: "infinite_horizon",  name: "The Infinite Horizon",  nameAr: "الأفق اللانهائي",   emoji: "🌍", type: "Institution",         typeAr: "مؤسسة",           style: "world's largest asset manager, thinks in decades, long-term compounding only" },
+  { id: "cycle_reader",      name: "The Cycle Reader",      nameAr: "قارئ الدورات",       emoji: "🌊", type: "Institution",         typeAr: "مؤسسة",           style: "macro hedge fund analyzing debt cycles and all-weather portfolio positioning" },
+  { id: "signal_engine",     name: "The Signal Engine",     nameAr: "محرك الإشارات",      emoji: "⚡", type: "Institution",         typeAr: "مؤسسة",           style: "pure quant firm, z-scores and expected value only, no narratives" },
+  { id: "value_oracle",      name: "The Value Oracle",      nameAr: "عراف القيمة",        emoji: "🧙", type: "Legendary Investor",  typeAr: "مستثمر أسطوري",  style: "60-year value investing legend, seeks moats and margin of safety, ignores all noise" },
+  { id: "reflexive_mind",    name: "The Reflexive Mind",    nameAr: "العقل الانعكاسي",   emoji: "🔮", type: "Legendary Investor",  typeAr: "مستثمر أسطوري",  style: "global macro legend using reflexivity theory, bets massively on self-reinforcing trends" },
+  { id: "the_skeptic",       name: "The Skeptic",           nameAr: "المشكك",             emoji: "🐻", type: "Contrarian",          typeAr: "عكسي",            style: "deep contrarian who hunts bubbles and overvalued assets, distrusts all Wall Street consensus" },
+  { id: "momentum_guardian", name: "The Momentum Guardian", nameAr: "حارس الزخم",         emoji: "📈", type: "Macro Trader",        typeAr: "متداول ماكرو",   style: "capital preservation first, follows momentum, cuts losses fast, risk management is religion" },
+  { id: "the_disruptor",     name: "The Disruptor",         nameAr: "المدمر الخلاق",      emoji: "🚀", type: "Innovation Investor", typeAr: "مستثمر الابتكار", style: "visionary innovation investor, 5-year minimum horizon, bets on exponential tech disruption" },
 ];
 
-// ─── SEARCH ───────────────────────────────────────────────────────────────────
+// ─── TAVILY SEARCH ────────────────────────────────────────────────────────────
 async function searchNews(asset, dateFrom, dateTo) {
   try {
     const query = dateFrom
-      ? `${asset} stock market ${dateFrom} ${dateTo}`
-      : `${asset} stock investment news analysis 2025`;
+      ? `${asset} stock market analysis ${dateFrom} ${dateTo}`
+      : `${asset} stock investment news 2025`;
+
     const res = await fetch("https://api.tavily.com/search", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -65,11 +90,11 @@ async function searchNews(asset, dateFrom, dateTo) {
     const data = await res.json();
     return {
       summary: data.answer || "",
-      articles: (data.results || []).map((r) => ({
-        title: r.title,
+      articles: (data.results || []).map(r => ({
+        title:   r.title,
         content: r.content?.slice(0, 300),
-        url: r.url,
-        date: r.published_date || "",
+        url:     r.url,
+        date:    r.published_date || "",
       })),
     };
   } catch (e) {
@@ -78,111 +103,141 @@ async function searchNews(asset, dateFrom, dateTo) {
   }
 }
 
-// ─── ALL ARCHETYPES IN ONE CALL ───────────────────────────────────────────────
-async function runAllArchetypes(context) {
-  const newsText = context.articles.length
+// ─── CALL 1: ALL 10 AGENTS IN ONE PROMPT ─────────────────────────────────────
+async function runAllAgents(context) {
+  const news = context.articles.length
     ? context.articles.map((a, i) => `${i+1}. ${a.title}: ${a.content}`).join("\n")
-    : `No specific news available, use general knowledge about ${context.asset}`;
+    : `No specific news. Use general knowledge about ${context.asset}.`;
 
-  const archetypeList = ARCHETYPES.map((a, i) =>
-    `${i+1}. id="${a.id}" style: ${a.style}`
-  ).join("\n");
-
-  const prompt = `You are simulating 10 different investment archetypes analyzing: ${context.asset}
+  const prompt = `Simulate 10 investment archetypes analyzing: ${context.asset}
 ${context.dateFrom ? `TIME PERIOD: ${context.dateFrom} to ${context.dateTo}` : ""}
 
-MARKET CONTEXT: ${context.summary || "Current market conditions"}
+MARKET CONTEXT: ${context.summary || "Current market"}
 
 NEWS:
-${newsText}
+${news}
 
-ARCHETYPES TO SIMULATE:
-${archetypeList}
+10 ARCHETYPES:
+${ARCHETYPES.map((a,i) => `${i+1}. id="${a.id}" - ${a.style}`).join("\n")}
 
-For EACH archetype, give a realistic analysis based on their style AND the actual news above.
-Make decisions VARIED — not all the same. Some should BUY, some SELL, some HOLD based on their philosophy.
+Analyze ${context.asset} for each archetype based on their style AND the actual news.
+Make decisions VARIED and realistic — mix of BUY/SELL/HOLD based on each archetype's philosophy.
 
-Return ONLY this JSON (no text before or after):
-{
-  "agents": [
-    {"id":"macro_fortress","decision":"SELL","confidence":72,"thesis":"2 sentences in their voice referencing actual news.","keyRisk":"Specific risk.","target":"Specific instrument.","timeHorizon":"Their horizon."},
-    {"id":"alpha_hunter","decision":"BUY","confidence":68,"thesis":"...","keyRisk":"...","target":"...","timeHorizon":"..."},
-    {"id":"infinite_horizon","decision":"HOLD","confidence":75,"thesis":"...","keyRisk":"...","target":"...","timeHorizon":"..."},
-    {"id":"cycle_reader","decision":"SELL","confidence":70,"thesis":"...","keyRisk":"...","target":"...","timeHorizon":"..."},
-    {"id":"signal_engine","decision":"BUY","confidence":80,"thesis":"...","keyRisk":"...","target":"...","timeHorizon":"..."},
-    {"id":"value_oracle","decision":"HOLD","confidence":65,"thesis":"...","keyRisk":"...","target":"...","timeHorizon":"..."},
-    {"id":"reflexive_mind","decision":"BUY","confidence":73,"thesis":"...","keyRisk":"...","target":"...","timeHorizon":"..."},
-    {"id":"the_skeptic","decision":"SELL","confidence":78,"thesis":"...","keyRisk":"...","target":"...","timeHorizon":"..."},
-    {"id":"momentum_guardian","decision":"BUY","confidence":69,"thesis":"...","keyRisk":"...","target":"...","timeHorizon":"..."},
-    {"id":"the_disruptor","decision":"BUY","confidence":82,"thesis":"...","keyRisk":"...","target":"...","timeHorizon":"..."}
-  ]
-}
+Return ONLY valid JSON:
+{"agents":[
+{"id":"macro_fortress","decision":"SELL","confidence":71,"thesis":"2 sentences in their voice referencing the actual news.","keyRisk":"Specific risk.","target":"Specific instrument.","timeHorizon":"Their typical horizon."},
+{"id":"alpha_hunter","decision":"BUY","confidence":74,"thesis":"...","keyRisk":"...","target":"...","timeHorizon":"..."},
+{"id":"infinite_horizon","decision":"HOLD","confidence":68,"thesis":"...","keyRisk":"...","target":"...","timeHorizon":"..."},
+{"id":"cycle_reader","decision":"SELL","confidence":66,"thesis":"...","keyRisk":"...","target":"...","timeHorizon":"..."},
+{"id":"signal_engine","decision":"BUY","confidence":79,"thesis":"...","keyRisk":"...","target":"...","timeHorizon":"..."},
+{"id":"value_oracle","decision":"HOLD","confidence":72,"thesis":"...","keyRisk":"...","target":"...","timeHorizon":"..."},
+{"id":"reflexive_mind","decision":"BUY","confidence":77,"thesis":"...","keyRisk":"...","target":"...","timeHorizon":"..."},
+{"id":"the_skeptic","decision":"SELL","confidence":81,"thesis":"...","keyRisk":"...","target":"...","timeHorizon":"..."},
+{"id":"momentum_guardian","decision":"BUY","confidence":70,"thesis":"...","keyRisk":"...","target":"...","timeHorizon":"..."},
+{"id":"the_disruptor","decision":"BUY","confidence":83,"thesis":"...","keyRisk":"...","target":"...","timeHorizon":"..."}
+]}
 
-IMPORTANT: Replace ALL "..." with real content. Make each thesis reference the actual news about ${context.asset}.`;
+Replace ALL "..." with real analysis of ${context.asset}.`;
 
   const result = await gemini(prompt, 3000);
   return result.agents || [];
 }
 
-// ─── CROWD + REPORT IN ONE CALL ───────────────────────────────────────────────
+// ─── CALL 2: CROWD + REPORT ───────────────────────────────────────────────────
 async function runCrowdAndReport(context, agents) {
-  const buyCount  = agents.filter(a => a.decision === "BUY").length;
-  const sellCount = agents.filter(a => a.decision === "SELL").length;
-  const holdCount = agents.filter(a => a.decision === "HOLD").length;
+  const buyC  = agents.filter(a => a.decision === "BUY").length;
+  const sellC = agents.filter(a => a.decision === "SELL").length;
+  const holdC = agents.filter(a => a.decision === "HOLD").length;
 
-  const prompt = `You are generating a market intelligence report for: ${context.asset}
+  const prompt = `Generate investment report and crowd simulation for: ${context.asset}
 ${context.dateFrom ? `PERIOD: ${context.dateFrom} to ${context.dateTo}` : ""}
 
-EXPERT VOTES: BUY ${buyCount}/10 | SELL ${sellCount}/10 | HOLD ${holdCount}/10
-
+EXPERT VOTES: BUY ${buyC}/10 | SELL ${sellC}/10 | HOLD ${holdC}/10
 NEWS SUMMARY: ${context.summary || "General market analysis"}
 
-Generate both crowd simulation AND final report.
-
-Return ONLY this JSON:
+Return ONLY valid JSON:
 {
-  "crowd": {
-    "groups": [
-      {"name":"Retail Traders","count":110,"decision":"BUY","sentiment":65,"reasoning":"Short sentence."},
-      {"name":"Conservative Savers","count":110,"decision":"HOLD","sentiment":42,"reasoning":"Short sentence."},
-      {"name":"Day Traders","count":110,"decision":"BUY","sentiment":70,"reasoning":"Short sentence."},
-      {"name":"Small Hedge Funds","count":110,"decision":"HOLD","sentiment":55,"reasoning":"Short sentence."},
-      {"name":"Tech Enthusiasts","count":110,"decision":"BUY","sentiment":78,"reasoning":"Short sentence."},
-      {"name":"Pension Managers","count":110,"decision":"HOLD","sentiment":45,"reasoning":"Short sentence."},
-      {"name":"EM Investors","count":110,"decision":"SELL","sentiment":38,"reasoning":"Short sentence."},
-      {"name":"Value Hunters","count":110,"decision":"BUY","sentiment":60,"reasoning":"Short sentence."},
-      {"name":"Momentum Traders","count":110,"decision":"BUY","sentiment":72,"reasoning":"Short sentence."}
+  "crowd":{
+    "groups":[
+      {"name":"Retail Traders","count":110,"decision":"BUY","sentiment":64,"reasoning":"One sentence."},
+      {"name":"Conservative Savers","count":110,"decision":"HOLD","sentiment":43,"reasoning":"One sentence."},
+      {"name":"Day Traders","count":110,"decision":"BUY","sentiment":71,"reasoning":"One sentence."},
+      {"name":"Small Hedge Funds","count":110,"decision":"HOLD","sentiment":54,"reasoning":"One sentence."},
+      {"name":"Tech Enthusiasts","count":110,"decision":"BUY","sentiment":76,"reasoning":"One sentence."},
+      {"name":"Pension Managers","count":110,"decision":"HOLD","sentiment":46,"reasoning":"One sentence."},
+      {"name":"EM Investors","count":110,"decision":"SELL","sentiment":37,"reasoning":"One sentence."},
+      {"name":"Value Hunters","count":110,"decision":"BUY","sentiment":61,"reasoning":"One sentence."},
+      {"name":"Momentum Traders","count":110,"decision":"BUY","sentiment":69,"reasoning":"One sentence."}
     ],
     "crowdDecision":"BUY",
-    "crowdSentiment":59,
+    "crowdSentiment":58,
     "herdBehaviorRisk":"MEDIUM",
-    "crowdInsight":"One powerful insight about crowd behavior for ${context.asset}."
+    "crowdInsight":"One powerful specific insight about ${context.asset} crowd behavior."
   },
-  "report": {
+  "report":{
     "verdict":"BUY",
-    "score":68,
-    "summary":"3-4 sentences about ${context.asset} investment case based on the expert votes and news.",
-    "buyPercentage":${buyCount * 10},
-    "holdPercentage":${holdCount * 10},
-    "sellPercentage":${sellCount * 10},
-    "entryStrategy":"Specific practical entry strategy.",
-    "stopLoss":"Specific stop loss recommendation.",
+    "score":67,
+    "summary":"3-4 specific sentences about ${context.asset} based on expert votes and news.",
+    "buyPercentage":${buyC*10},
+    "holdPercentage":${holdC*10},
+    "sellPercentage":${sellC*10},
+    "entryStrategy":"Specific practical entry advice for ${context.asset}.",
+    "stopLoss":"Specific stop loss for ${context.asset}.",
     "topOpportunity":"Biggest specific opportunity for ${context.asset}.",
     "topRisk":"Biggest specific risk for ${context.asset}.",
     "scenarios":[
-      {"name":"Bull Case","probability":35,"description":"Specific bull scenario."},
-      {"name":"Base Case","probability":45,"description":"Most likely outcome."},
-      {"name":"Bear Case","probability":20,"description":"Specific bear scenario."}
+      {"name":"Bull Case","probability":35,"description":"Specific bull scenario for ${context.asset}."},
+      {"name":"Base Case","probability":45,"description":"Most likely outcome for ${context.asset}."},
+      {"name":"Bear Case","probability":20,"description":"Specific bear scenario for ${context.asset}."}
     ],
-    "keyMetrics":["Metric 1 to watch","Metric 2 to watch","Metric 3 to watch"],
+    "keyMetrics":["Specific metric 1","Specific metric 2","Specific metric 3"],
     "timeHorizon":"Recommended investment horizon."
   }
 }
-
-Replace ALL placeholder text with real analysis of ${context.asset}.
-verdict must be: STRONG BUY, BUY, HOLD, SELL, or STRONG SELL`;
+Replace ALL placeholder text with real analysis. verdict must be: STRONG BUY, BUY, HOLD, SELL, or STRONG SELL`;
 
   return await gemini(prompt, 2000);
+}
+
+// ─── FALLBACK DATA ────────────────────────────────────────────────────────────
+function getFallback(asset, agents) {
+  const buyC  = agents.filter(a => a.decision === "BUY").length;
+  const sellC = agents.filter(a => a.decision === "SELL").length;
+  const holdC = agents.filter(a => a.decision === "HOLD").length;
+  const v = buyC >= 5 ? "BUY" : sellC >= 5 ? "SELL" : "HOLD";
+  return {
+    crowd: {
+      groups: [
+        {name:"Retail Traders",count:110,decision:"BUY",sentiment:62,reasoning:"Following positive momentum."},
+        {name:"Conservative Savers",count:110,decision:"HOLD",sentiment:44,reasoning:"Cautious long-term approach."},
+        {name:"Day Traders",count:110,decision:"BUY",sentiment:68,reasoning:"Technical breakout signals."},
+        {name:"Small Hedge Funds",count:110,decision:"HOLD",sentiment:51,reasoning:"Awaiting confirmation."},
+        {name:"Tech Enthusiasts",count:110,decision:"BUY",sentiment:75,reasoning:"Strong growth narrative."},
+        {name:"Pension Managers",count:110,decision:"HOLD",sentiment:46,reasoning:"Stability first approach."},
+        {name:"EM Investors",count:110,decision:"SELL",sentiment:39,reasoning:"Global risk concerns."},
+        {name:"Value Hunters",count:110,decision:"BUY",sentiment:60,reasoning:"Trading below intrinsic value."},
+        {name:"Momentum Traders",count:110,decision:v,sentiment:66,reasoning:"Trend continues."},
+      ],
+      crowdDecision: v, crowdSentiment: 57, herdBehaviorRisk: "MEDIUM",
+      crowdInsight: `Mixed crowd sentiment for ${asset} with slight ${v} bias.`,
+    },
+    report: {
+      verdict: v, score: 50 + buyC * 4,
+      summary: `${asset} shows ${buyC} buy, ${holdC} hold, ${sellC} sell signals from 10 expert archetypes.`,
+      buyPercentage: buyC*10, holdPercentage: holdC*10, sellPercentage: sellC*10,
+      entryStrategy: `Enter ${asset} position gradually over 2-3 tranches.`,
+      stopLoss: "8-10% below entry price.",
+      topOpportunity: `${asset} upside if market conditions improve.`,
+      topRisk: "Macro uncertainty and sector rotation risk.",
+      scenarios: [
+        {name:"Bull Case",probability:35,description:`${asset} outperforms on positive catalysts.`},
+        {name:"Base Case",probability:45,description:`${asset} consolidates near current levels.`},
+        {name:"Bear Case",probability:20,description:`${asset} declines on macro headwinds.`},
+      ],
+      keyMetrics: ["Revenue growth rate","Profit margin trends","Market sentiment index"],
+      timeHorizon: "6-12 months",
+    },
+  };
 }
 
 // ─── MAIN ENDPOINT ────────────────────────────────────────────────────────────
@@ -199,79 +254,43 @@ app.post("/api/analyze", async (req, res) => {
     const context  = { asset, dateFrom, dateTo, ...newsData };
     console.log(`   Got ${context.articles.length} articles`);
 
-    // 2. All 10 agents in ONE call
-    console.log("🧠 Running all 10 archetypes in one call...");
+    // 2. All 10 agents — 1 Gemini call
+    console.log("🧠 Running 10 agents...");
     let agentData = [];
     try {
-      agentData = await runAllArchetypes(context);
-    } catch (err) {
-      console.error("Archetypes failed:", err.message);
+      agentData = await runAllAgents(context);
+      console.log(`   Got ${agentData.length} agent responses`);
+    } catch (e) {
+      console.error("Agents failed:", e.message);
     }
 
-    // Merge archetype metadata with agent results
+    // Merge with archetype metadata
     const archetypeResults = ARCHETYPES.map((a, i) => {
-      const found = agentData.find(d => d.id === a.id);
+      const d = agentData.find(x => x.id === a.id);
       return {
         ...a,
-        decision: found?.decision || ["BUY","HOLD","SELL"][i % 3],
-        confidence: found?.confidence || (58 + i * 3),
-        allocation: "3-5% of portfolio",
-        thesis: found?.thesis || `${a.name} analysis of ${asset} based on current market conditions.`,
-        keyRisk: found?.keyRisk || "Market volatility and macro uncertainty.",
-        target: found?.target || asset,
-        timeHorizon: found?.timeHorizon || "6-12 months",
+        decision:    d?.decision    || ["BUY","HOLD","SELL","BUY","HOLD","SELL","BUY","HOLD","BUY","SELL"][i],
+        confidence:  d?.confidence  || (60 + i * 3),
+        allocation:  "3-5% of portfolio",
+        thesis:      d?.thesis      || `${a.name} perspective on ${asset}.`,
+        keyRisk:     d?.keyRisk     || "Market volatility.",
+        target:      d?.target      || asset,
+        timeHorizon: d?.timeHorizon || "6-12 months",
       };
     });
 
-    // 3. Crowd + Report in ONE call
-    console.log("👥📊 Running crowd + report in one call...");
-    let crowdResult, report;
+    // 3. Crowd + Report — 1 Gemini call
+    console.log("👥📊 Generating crowd + report...");
+    let crowd, report;
     try {
       const combined = await runCrowdAndReport(context, archetypeResults);
-      crowdResult = combined.crowd;
+      crowd  = combined.crowd;
       report = combined.report;
-    } catch (err) {
-      console.error("Crowd/Report failed:", err.message);
-      const buyC  = archetypeResults.filter(a => a.decision === "BUY").length;
-      const sellC = archetypeResults.filter(a => a.decision === "SELL").length;
-      const holdC = archetypeResults.filter(a => a.decision === "HOLD").length;
-      const verdict = buyC >= 5 ? "BUY" : sellC >= 5 ? "SELL" : "HOLD";
-      crowdResult = {
-        groups: [
-          {name:"Retail Traders",count:110,decision:"BUY",sentiment:62,reasoning:"Following market trend."},
-          {name:"Conservative Savers",count:110,decision:"HOLD",sentiment:44,reasoning:"Cautious approach."},
-          {name:"Day Traders",count:110,decision:"BUY",sentiment:68,reasoning:"Technical signals positive."},
-          {name:"Small Hedge Funds",count:110,decision:"HOLD",sentiment:52,reasoning:"Awaiting confirmation."},
-          {name:"Tech Enthusiasts",count:110,decision:"BUY",sentiment:75,reasoning:"Long-term growth story."},
-          {name:"Pension Managers",count:110,decision:"HOLD",sentiment:46,reasoning:"Stability priority."},
-          {name:"EM Investors",count:110,decision:"SELL",sentiment:39,reasoning:"Currency risk."},
-          {name:"Value Hunters",count:110,decision:"BUY",sentiment:61,reasoning:"Value opportunity."},
-          {name:"Momentum Traders",count:110,decision:verdict,sentiment:66,reasoning:"Trend following signal."},
-        ],
-        crowdDecision: verdict,
-        crowdSentiment: 57,
-        herdBehaviorRisk: "MEDIUM",
-        crowdInsight: `Crowd sentiment for ${asset} shows mixed signals with slight bias toward ${verdict}.`,
-      };
-      report = {
-        verdict,
-        score: 50 + buyC * 4,
-        summary: `${asset} analysis shows ${buyC} buy, ${holdC} hold, ${sellC} sell from expert archetypes.`,
-        buyPercentage:  buyC  * 10,
-        holdPercentage: holdC * 10,
-        sellPercentage: sellC * 10,
-        entryStrategy: `Scale into ${asset} gradually across 2-3 tranches.`,
-        stopLoss: "8-10% below entry price.",
-        topOpportunity: `${asset} upside potential based on current analyst consensus.`,
-        topRisk: "Macro uncertainty and market volatility.",
-        scenarios: [
-          {name:"Bull Case",probability:35,description:`${asset} outperforms if conditions improve.`},
-          {name:"Base Case",probability:45,description:`${asset} consolidates near current levels.`},
-          {name:"Bear Case",probability:20,description:`${asset} declines if macro headwinds intensify.`},
-        ],
-        keyMetrics: ["Revenue growth", "Profit margins", "Market sentiment"],
-        timeHorizon: "6-12 months",
-      };
+    } catch (e) {
+      console.error("Crowd/Report failed:", e.message);
+      const fb = getFallback(asset, archetypeResults);
+      crowd  = fb.crowd;
+      report = fb.report;
     }
 
     console.log(`✅ Done! Verdict: ${report.verdict}`);
@@ -280,8 +299,7 @@ app.post("/api/analyze", async (req, res) => {
       asset, dateFrom, dateTo,
       news: { summary: context.summary, articles: context.articles },
       archetypes: archetypeResults,
-      crowd: crowdResult,
-      report,
+      crowd, report,
     });
 
   } catch (err) {
@@ -290,7 +308,7 @@ app.post("/api/analyze", async (req, res) => {
   }
 });
 
-app.get("/health", (_req, res) => res.json({ status: "ok" }));
+app.get("/health", (_req, res) => res.json({ status: "ok", name: "The Pantheon" }));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`\n🏛️  The Pantheon on port ${PORT}\n`));

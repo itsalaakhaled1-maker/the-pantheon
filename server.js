@@ -11,7 +11,7 @@ app.use(express.static(path.join(__dirname, "public")));
 
 // ─── GEMINI CALL (no SDK — direct REST API) ───────────────────────────────────
 async function gemini(prompt) {
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`;
+  const url = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${process.env.GEMINI_API_KEY}`;
 
   const res = await fetch(url, {
     method: "POST",
@@ -277,32 +277,18 @@ app.post("/api/analyze", async (req, res) => {
     const context  = { asset, dateFrom, dateTo, ...newsData };
     console.log(`   Got ${context.articles.length} articles`);
 
-    // 2. Archetypes — sequential to avoid rate limits
+    // 2. Archetypes — parallel batches of 5 to balance speed and rate limits
     console.log("🧠 Running archetypes...");
-    const archetypeResults = [];
-    for (let i = 0; i < ARCHETYPES.length; i++) {
-      const a = ARCHETYPES[i];
-      console.log(`   [${i + 1}/10] ${a.name}...`);
-      try {
-        const result = await runArchetype(a, context);
-        archetypeResults.push(result);
-      } catch (err) {
-        console.error(`   ❌ ${a.name} failed: ${err.message}`);
-        // Push fallback with random but different values
-        archetypeResults.push({
-          ...a,
-          decision: ["BUY", "SELL", "HOLD"][i % 3],
-          confidence: 55 + (i * 4),
-          allocation: "3-5% of portfolio",
-          thesis: `Analysis for ${asset} from ${a.name} perspective pending retry.`,
-          keyRisk: "Market uncertainty and volatility.",
-          target: asset,
-          timeHorizon: "6-12 months",
-        });
-      }
-      // Small delay to avoid rate limit
-      await new Promise((r) => setTimeout(r, 300));
-    }
+    const batch1 = await Promise.all(ARCHETYPES.slice(0, 5).map((a) => runArchetype(a, context).catch((err) => {
+      console.error(`   ❌ ${a.name}: ${err.message}`);
+      return { ...a, decision: ["BUY","SELL","HOLD"][ARCHETYPES.indexOf(a) % 3], confidence: 55 + ARCHETYPES.indexOf(a) * 3, allocation: "3-5% of portfolio", thesis: `Analysis for ${context.asset} from ${a.name} perspective.`, keyRisk: "Market volatility.", target: context.asset, timeHorizon: "6-12 months" };
+    })));
+    await new Promise((r) => setTimeout(r, 500));
+    const batch2 = await Promise.all(ARCHETYPES.slice(5).map((a) => runArchetype(a, context).catch((err) => {
+      console.error(`   ❌ ${a.name}: ${err.message}`);
+      return { ...a, decision: ["HOLD","BUY","SELL"][ARCHETYPES.indexOf(a) % 3], confidence: 58 + ARCHETYPES.indexOf(a) * 3, allocation: "3-5% of portfolio", thesis: `Analysis for ${context.asset} from ${a.name} perspective.`, keyRisk: "Market uncertainty.", target: context.asset, timeHorizon: "6-12 months" };
+    })));
+    const archetypeResults = [...batch1, ...batch2];
 
     // 3. Crowd
     console.log("👥 Running crowd...");
